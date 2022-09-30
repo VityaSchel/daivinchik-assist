@@ -1,16 +1,17 @@
 {
   "name": "daivinchik-assist",
   "version": "1.0.0",
+  "description": "Assistance app for Leomatch bot in Telegram (dating service)",
+  "author": "vityaschel <hi@hloth.dev> (https://hloth.dev/)",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start:mobile": "expo start",
     "start:standalone": "yarn expo-electron start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:android": "sudo eas build --platform android --local",
-    "build:standalone:dev": "yarn electron-webpack && yarn electron-builder --dir -c.compression=store -c.mac.identity=null -c.compression=store",
-    "build:standalone:prod": "yarn electron-webpack && yarn electron-builder --dir -c.compression=store -c.mac.identity=null"
+    "build:standalone": "yarn electron-webpack && yarn electron-builder --dir --config electron-builder.config.js"
   },
   "engines": {
     "npm": "please-use-yarn",
@@ -18,7 +19,6 @@
     "node": ">= 16.13.0"
   },
   "dependencies": {
-    "electron": "^6.0.12",
     "expo": "~46.0.13",
     "expo-status-bar": "~1.4.0",
     "react": "18.0.0",
@@ -32,7 +32,13 @@
     "@expo/webpack-config": "^0.17.2",
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.69.1",
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "babel-loader": "^8.2.5",
+    "electron": "^6.0.12",
+    "electron-builder": "^23.3.3",
+    "eslint": "^8.24.0",
+    "eslint-plugin-react": "^7.31.8",
     "typescript": "~4.3.5"
-  },
-  "private": true
+  }
 }
