@@ -2,10 +2,10 @@
 
 ## Запуск сервера разработки
 
-`yarn start:standalone` запускает сервер electron-builder и создает окно, в котором будет
+`yarn start:standalone` запускает сервер electron-builder и создает окно, в котором программа будет обновляться в реальном времени
 
-`start:mobile` запускает сервер expo и 
+`start:mobile` запускает сервер expo для разработки на мобильных устройствах
 
 ## Сборка проекта
 
-`yarn build:standalone` собирает проект
+`yarn build:standalone` собирает проект для ПК

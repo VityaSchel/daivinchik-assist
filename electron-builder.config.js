@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 module.exports = {
   appId: 'com.vityaschel.daivinchik-assist',
   productName: 'Дайвинчик Ассист',
@@ -6,7 +7,7 @@ module.exports = {
     identity: null
   },
   extraMetadata: {
-    main: 'main.js'
+    main: 'main.ts'
   },
   files: [
     {
