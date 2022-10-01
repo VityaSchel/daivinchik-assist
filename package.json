@@ -11,7 +11,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:android": "sudo eas build --platform android --local",
-    "build:standalone": "yarn electron-webpack && yarn electron-builder --dir --config electron-builder.config.js"
+    "build:standalone": "yarn electron-webpack && yarn electron-builder --dir --config electron-builder.config.js",
+    "postinstall": "patch-package"
   },
   "engines": {
     "npm": "please-use-yarn",
@@ -21,8 +22,11 @@
   "dependencies": {
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.0",
+    "babel-plugin-search-and-replace": "^1.1.1",
     "expo": "~46.0.13",
     "expo-status-bar": "~1.4.0",
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-native": "0.69.6",
