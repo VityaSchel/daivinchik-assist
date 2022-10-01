@@ -1,12 +1,14 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { Button, StyleSheet, TextInput, Text, View } from 'react-native'
-
+import { StyleSheet, View } from 'react-native'
+import { Text, Button, HelperText, TextInput } from 'react-native-paper'
 import { subscribeEffect, usingElectron, electron } from '../../electron-wrapper'
 import { useNavigation } from '@react-navigation/native'
+import Container from '../../Container'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
+  const [error, setError] = React.useState(null)
   const navigation = useNavigation()
 
   const sendCode = () => {
@@ -17,18 +19,23 @@ export default function LoginPhoneScreen() {
     }
   }
 
-  React.useEffect(subscribeEffect('login_phone_result', (data: { phone_code_hash: string }) => {
+  React.useEffect(subscribeEffect('login_phone_result', (_, data: { phone_code_hash: string }) => {
     console.log(data)
-    navigation.push('LoginCode')
+    if(data.error) {
+      setError(data.error)
+    } else {
+      navigation.push('LoginCode')
+    }
   }), [])
 
   return (
-    <View style={{ display: 'flex', flexDirection: 'column' }}>
-      <Text>Привет!</Text>
+    <Container>
+      <Text variant="headlineLarge" style={{ fontWeight: 'bold' }}>Привет!</Text>
       <Text>Введи номер телефона от Telegram</Text>
-      <TextInput value={phone} onChangeText={setPhone} style={{ borderStyle: 'solid', borderColor: 'black', borderWidth: 1 }} />
-      <Button onPress={sendCode} title='Войти' />
+      <TextInput placeholder='Например, +79019404698' value={phone} onChangeText={setPhone} error={Boolean(error)} />
+      <HelperText type='error' visible={Boolean(error)}>{error}</HelperText>
+      <Button mode='contained' onPress={sendCode}>Войти</Button>
       <StatusBar style="auto" />
-    </View>
+    </Container>
   )
 }

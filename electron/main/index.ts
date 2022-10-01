@@ -1,22 +1,14 @@
 'use strict'
 
+import './.env'
 import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
-import './.env'
 import { sendLoginCode, enterLoginCode, enterTwoFACode } from './mtproto/index'
 import fs from 'fs'
 import log from 'electron-log'
-export { log }
 
-// export const log = {
-//   info: (...args: string[]) => {
-//     if(isDevelopment) return false
-//     fs.appendFileSync('electron.log', args.join(' ').concat('\n'))
-//   }
-// }
-
-log.info('Started Electron app at', (new Date()).toISOString())
+log.info('Started Electron app')
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -54,8 +46,14 @@ function createMainWindow() {
   })
 
   ipcMain.on('login_phone', async (event, phoneNumber: string) => {
-    const result = await sendLoginCode(phoneNumber)
-    event.reply('login_phone_result', { phone_code_hash: result.phone_code_hash })
+    try {
+      const result = await sendLoginCode(phoneNumber)
+      if(result.error) event.reply('login_phone_result', { error: result.error })
+      else event.reply('login_phone_result', { phone_code_hash: result.phone_code_hash })
+    } catch(e) {
+      log.error('Error while sending code to phone', phoneNumber, JSON.stringify(e))
+      event.reply('login_phone_result', { error: JSON.stringify(e) })
+    }
   })
   // ipcMain.on('login_code', (_, loginCode: string) => enterLoginCode(loginCode))
 
