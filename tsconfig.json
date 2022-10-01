@@ -5,6 +5,13 @@
     "strict": true,
     "target": "ES5",
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "/*": [
+        "src/*"
+      ]
+    }
   },
   "include": ["electron/**/*"]
 }

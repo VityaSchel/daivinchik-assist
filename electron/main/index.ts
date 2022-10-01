@@ -35,15 +35,15 @@ function createMainWindow() {
   })
 
   browserWindow.webContents.on('devtools-opened', () => {
-    // browserWindow.focus()
-    // setImmediate(() => {
-    //   browserWindow.focus()
-    // })
+    browserWindow.focus()
+    setImmediate(() => {
+      browserWindow.focus()
+    })
   })
 
-  ipcMain.on('login_phone', (event, phoneNumber: string) => {
-    // const result = sendLoginCode(phoneNumber)
-    event.reply('login_phone_result', { result: true })
+  ipcMain.on('login_phone', async (event, phoneNumber: string) => {
+    const result = await sendLoginCode(phoneNumber)
+    event.reply('login_phone_result', { phone_code_hash: result.phone_code_hash })
   })
   // ipcMain.on('login_code', (_, loginCode: string) => enterLoginCode(loginCode))
 

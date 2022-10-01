@@ -1,35 +1,32 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { Button, StyleSheet, TextInput, Text, View } from 'react-native'
-import electron from 'electron'
-import { useNavigation } from '@react-navigation/native'
 
-const usingElectron = false
+import { subscribeEffect, usingElectron, electron } from '../../electron-wrapper'
+import { useNavigation } from '@react-navigation/native'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
   const navigation = useNavigation()
 
-  React.useEffect(() => {
+  const sendCode = () => {
     if(usingElectron) {
-      const callback = () => {
-        navigation.push('LoginCode')
-      }
-
-      electron.ipcRenderer.on('login_phone_result', callback)
-
-      return () => {
-        electron.ipcRenderer.removeListener('login_phone_result', callback)
-      }
+      electron.ipcRenderer.send('login_phone', phone)
+    } else {
+      
     }
-  }, [])
+  }
+
+  React.useEffect(subscribeEffect('login_phone_result', () => {
+    navigation.push('LoginCode')
+  }), [])
 
   return (
     <View style={{ display: 'flex', flexDirection: 'column' }}>
       <Text>Привет!</Text>
       <Text>Введи номер телефона от Telegram</Text>
       <TextInput value={phone} onChangeText={setPhone} style={{ borderStyle: 'solid', borderColor: 'black', borderWidth: 1 }} />
-      <Button onPress={() => usingElectron && electron.ipcRenderer.send('login_phone', phone)} title='Войти' />
+      <Button onPress={sendCode} title='Войти' />
       <StatusBar style="auto" />
     </View>
   )

@@ -1,3 +1,6 @@
 {
-  "editor.tabCompletion": "on"
+  "editor.tabCompletion": "on",
+  "path-intellisense.mappings": {
+    "/*": "${workspaceFolder}/*"
+  }
 }
