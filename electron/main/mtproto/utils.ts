@@ -14,6 +14,9 @@ export async function getUser(): Promise<object | null> {
   }
 }
 
+/**
+ * @param phone Must start with `+` and have international format
+ */
 export function sendCode(phone: string) {
   return api.call('auth.sendCode', {
     phone_number: phone,

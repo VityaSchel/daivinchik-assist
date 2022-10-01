@@ -1,8 +1,10 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
+import './.env'
+import { sendLoginCode, enterLoginCode, enterTwoFACode } from './mtproto/index'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -33,11 +35,17 @@ function createMainWindow() {
   })
 
   browserWindow.webContents.on('devtools-opened', () => {
-    browserWindow.focus()
-    setImmediate(() => {
-      browserWindow.focus()
-    })
+    // browserWindow.focus()
+    // setImmediate(() => {
+    //   browserWindow.focus()
+    // })
   })
+
+  ipcMain.on('login_phone', (event, phoneNumber: string) => {
+    // const result = sendLoginCode(phoneNumber)
+    event.reply('login_phone_result', { result: true })
+  })
+  // ipcMain.on('login_code', (_, loginCode: string) => enterLoginCode(loginCode))
 
   return browserWindow
 }

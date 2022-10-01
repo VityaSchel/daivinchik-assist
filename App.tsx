@@ -1,11 +1,22 @@
-import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text, View } from 'react-native'
+import { Button, StyleSheet, Text, View } from 'react-native'
+import { ipcRenderer } from 'electron'
+import { NativeRouter } from 'react-router-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import LoginPhoneScreen from './src/screens/login/phone'
+import LoginCodeScreen from './src/screens/login/code'
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Hello world</Text>
-      <StatusBar style="auto" />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name='LoginPhone' component={LoginPhoneScreen} />
+          <Stack.Screen name='LoginCode' component={LoginCodeScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   )
 }
@@ -16,6 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    width: 100
   },
 })
 
