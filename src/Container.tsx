@@ -1,6 +1,6 @@
 import React from 'react'
-import { SafeAreaView, StyleSheet, View } from 'react-native'
-import styles from './styles/globals.module.scss'
+import { SafeAreaView, View } from 'react-native'
+import styles from './styles/globals'
 
 export default function Container(props: { children: React.ReactNode }) {
   return (

@@ -1,11 +1,11 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, View, Linking } from 'react-native'
+import { View, Linking } from 'react-native'
 import { Text, Button, HelperText, TextInput } from 'react-native-paper'
 import { subscribeEffect, electron, usingElectron } from '../../electron-wrapper'
 import { useNavigation } from '@react-navigation/native'
 import Container from '../../Container'
-import styles from '../../styles/Login.scss'
+import styles from '../../styles/Login'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
