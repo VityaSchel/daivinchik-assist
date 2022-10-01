@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-sass-transformer/index.js b/node_modules/react-native-sass-transformer/index.js
+index 6076d0b..f56a829 100644
+--- a/node_modules/react-native-sass-transformer/index.js
++++ b/node_modules/react-native-sass-transformer/index.js
+@@ -107,6 +107,7 @@ module.exports.transform = function (src, filename, options) {
+ 
+   if (filename.endsWith(".scss") || filename.endsWith(".sass")) {
+     var css = renderToCSS({ src, filename, options });
++    css = css.replaceAll(/( *\.\w+){2,} {/g, '$1 {')
+     var cssObject = renderCSSToReactNative(css);
+     return upstreamTransformer.transform({
+       src: "module.exports = " + JSON.stringify(cssObject),

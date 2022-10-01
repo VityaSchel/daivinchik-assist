@@ -1,24 +1,17 @@
 diff --git a/node_modules/metro-react-native-babel-transformer/src/index.js b/node_modules/metro-react-native-babel-transformer/src/index.js
-index 3b7bdb7..f969e4c 100644
+index 3b7bdb7..816c63e 100644
 --- a/node_modules/metro-react-native-babel-transformer/src/index.js
 +++ b/node_modules/metro-react-native-babel-transformer/src/index.js
-@@ -128,7 +128,19 @@ function buildBabelConfig(filename, options, plugins = []) {
+@@ -128,7 +128,12 @@ function buildBabelConfig(filename, options, plugins = []) {
    };
    let config = { ...babelRC, ...extraConfig }; // Add extra plugins
  
 -  const extraPlugins = [];
 +  const extraPlugins = [
-+    [
-+      "search-and-replace",
-+      {
-+        "rules": [
-+          {
-+            "search": "import electron from 'electron'",
-+            "replace": "const electron = null"
-+          }
-+        ]
-+      }
-+    ]
++    ["babel-plugin-replace-imports", {
++      "test": /^electron$/i,
++      "replacer": "aboba"
++    }]
 +  ];
  
    if (options.inlineRequires) {
