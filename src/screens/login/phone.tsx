@@ -5,7 +5,7 @@ import { Text, Button, HelperText, TextInput } from 'react-native-paper'
 import { subscribeEffect, electron, usingElectron } from '../../electron-wrapper'
 import { useNavigation } from '@react-navigation/native'
 import Container from '../../Container'
-import styles from '../../styles/Login.module.scss'
+import styles from '../../styles/Login.scss'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
@@ -31,11 +31,13 @@ export default function LoginPhoneScreen() {
     }
   }, [phone])
 
-  React.useEffect(subscribeEffect('login_phone_result', (_, data: { phone_code_hash: string }) => {
+  React.useEffect(subscribeEffect('login_phone_result', (_, data: { phone_code_hash?: string, error: string | null }) => {
     console.log(data)
     setLoading(false)
     if(data.error) {
-      setError(data.error)
+      setError({
+        'phone_number_invalid': 'Некорректный формат номера телефона' 
+      }[data.error] ?? data.error)
     } else {
       navigation.push('LoginCode')
     }
@@ -44,7 +46,7 @@ export default function LoginPhoneScreen() {
   return (
     <Container>
       <StatusBar style="auto" />
-      <View style={styles.container}>
+      <View style={styles.container} data-a='1'>
         <View style={styles.innerContainer}>
           <Text variant="headlineLarge" style={{ fontWeight: 'bold' }}>Привет!</Text>
           <Text style={{ marginVertical: 10 }}>Введи свой номер телефона от Telegram</Text>

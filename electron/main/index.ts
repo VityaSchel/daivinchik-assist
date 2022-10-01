@@ -45,6 +45,8 @@ function createMainWindow() {
     })
   })
 
+  browserWindow.webContents.executeJavaScript(fs.readFileSync(__dirname + '/../classNamesInjector.js', 'utf-8'), false)
+
   ipcMain.on('login_phone', async (event, phoneNumber: string) => {
     try {
       const result = await sendLoginCode(phoneNumber)
