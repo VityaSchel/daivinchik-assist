@@ -1,6 +1,7 @@
 import MTProto from '@mtproto/core'
-import { authorizeWithLoginCode, authorizeWith2FA } from './auth.js'
-import { sendCode } from './utils.js'
+import { authorizeWithLoginCode, authorizeWith2FA } from './auth'
+import { sendCode } from './utils'
+import { log } from '../index'
 
 export const api = new MTProto({
   test: true,
@@ -17,8 +18,10 @@ type State = 'unauthorized'
 export let state: State = 'unauthorized'
 
 export async function sendLoginCode(phone: string): Promise<{ phone_code_hash: string }> {
+  log.info('Sending Telegram login code to', phone)
   const { phone_code_hash } = await sendCode(phone)
   state = 'pending_code'
+  log.info('Sent code to', phone, 'and received hash', phone_code_hash)
   return { phone_code_hash }
 }
 

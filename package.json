@@ -47,6 +47,7 @@
     "babel-loader": "^8.2.5",
     "electron": "^6.0.12",
     "electron-builder": "^23.3.3",
+    "electron-log": "^4.4.8",
     "electron-webpack-ts": "^4.0.1",
     "eslint": "^8.24.0",
     "eslint-plugin-react": "^7.31.8",

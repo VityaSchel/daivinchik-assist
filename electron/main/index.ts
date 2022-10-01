@@ -5,6 +5,18 @@ import * as path from 'path'
 import { format as formatUrl } from 'url'
 import './.env'
 import { sendLoginCode, enterLoginCode, enterTwoFACode } from './mtproto/index'
+import fs from 'fs'
+import log from 'electron-log'
+export { log }
+
+// export const log = {
+//   info: (...args: string[]) => {
+//     if(isDevelopment) return false
+//     fs.appendFileSync('electron.log', args.join(' ').concat('\n'))
+//   }
+// }
+
+log.info('Started Electron app at', (new Date()).toISOString())
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

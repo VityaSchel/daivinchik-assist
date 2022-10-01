@@ -13,11 +13,12 @@ export default function LoginPhoneScreen() {
     if(usingElectron) {
       electron.ipcRenderer.send('login_phone', phone)
     } else {
-      
+
     }
   }
 
-  React.useEffect(subscribeEffect('login_phone_result', () => {
+  React.useEffect(subscribeEffect('login_phone_result', (data: { phone_code_hash: string }) => {
+    console.log(data)
     navigation.push('LoginCode')
   }), [])
 

@@ -1,4 +1,4 @@
-import { getUser, sendCode, signIn, getPassword, checkPassword } from './utils.js'
+import { getUser, sendCode, signIn, getPassword, checkPassword } from './utils'
 import { api } from './index'
 
 export async function authorizeWithLoginCode(phone_code_hash: string, phone: string, code: string): Promise<
