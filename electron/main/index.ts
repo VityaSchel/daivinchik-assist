@@ -3,7 +3,6 @@
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
-import { writeFileSync } from 'fs'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -15,7 +14,6 @@ function createMainWindow() {
 
   if (isDevelopment) {
     browserWindow.webContents.openDevTools()
-    browserWindow.webContents.insertText('hui')
   }
 
   if (isDevelopment) {

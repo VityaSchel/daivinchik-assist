@@ -1,6 +1,0 @@
-{
-  "compilerOptions": {
-    "strict": false,
-    "target": "ES6"
-  }
-}

@@ -1,7 +1,10 @@
 {
-  "extends": "expo/tsconfig.base",
+  // "extends": "expo/tsconfig.base",
+  "extends": "./node_modules/electron-webpack/tsconfig-base.json",
   "compilerOptions": {
     "strict": true,
-    "target": "ES5"
-  }
+    "target": "ES5",
+    "skipLibCheck": true,
+  },
+  "include": ["electron/**/*"]
 }
