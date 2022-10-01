@@ -1,13 +1,15 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { Button, StyleSheet, TextInput, Text, View } from 'react-native'
-// import { ipcRenderer } from 'electron'
+import electron from 'electron'
+// const electron = null // #WEBPACK_REPLACE#
+import electronWrapper from '../../electron-wrapper'
 import { useNavigation } from '@react-navigation/native'
 
-let electron
-if(false) {
-  electron = import('electron')
-}
+// let electron
+// if(false) {
+//   electron = electronWrapper
+// }
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
