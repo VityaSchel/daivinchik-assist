@@ -1,4 +1,5 @@
-import { api } from './index'
+// import { api } from './index'
+const api = {}
 
 export async function getUser(): Promise<object | null> {
   try {
@@ -18,7 +19,7 @@ export async function getUser(): Promise<object | null> {
  * @param phone Must start with `+` and have international format
  */
 export function sendCode(phone: string) {
-  return api.call('auth.sendCode', {
+  return global.api.call('auth.sendCode', {
     phone_number: phone,
     settings: {
       _: 'codeSettings',

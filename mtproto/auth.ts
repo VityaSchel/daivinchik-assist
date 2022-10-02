@@ -1,5 +1,6 @@
 import { getUser, sendCode, signIn, getPassword, checkPassword } from './utils'
-import { api } from './index'
+// import { api } from './index'
+const api = {}
 
 export async function authorizeWithLoginCode(phone_code_hash: string, phone: string, code: string): Promise<
   { user: object, error: null } 

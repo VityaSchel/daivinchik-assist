@@ -6,6 +6,7 @@ export function resetNavigation(navigation: NavProp, routeName: string, params?:
   navigation.reset({ routes: [{ name: routeName, params }], index: 0 })
 }
 
-export function resetNavigationWithHistory(navigation: NavProp, routes: { name: string, params?: { [key: string]: any } }[], index = 0) {
+export function resetNavigationWithHistory(navigation: NavProp, routes: { name: string, params?: { [key: string]: any } }[], index?: number) {
+  index = index ?? routes.length - 1
   navigation.reset({ routes: routes.map(r => ({ name: r.name, params: r.params })), index })
 }

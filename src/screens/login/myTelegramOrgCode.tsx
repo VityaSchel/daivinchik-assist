@@ -8,7 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
 import Info from '../../components/Login/Info'
-import { resetNavigation } from '../../../utils'
+import { resetNavigation, resetNavigationWithHistory } from '../../../utils'
 
 export default function LoginPhoneScreen() {
   const [code, setCode] = React.useState<string>('')
@@ -63,7 +63,7 @@ export default function LoginPhoneScreen() {
             mode='outlined'
             style={styles.button}
             disabled={loading}
-            onPress={() => resetNavigation(navigation, 'ManualTokensInput', { phone: phone })}
+            onPress={() => resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'ManualTokensInput', params: { phone: phone } }])}
           >
             Не приходит код?
           </Button>

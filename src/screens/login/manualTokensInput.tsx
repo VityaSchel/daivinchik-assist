@@ -1,19 +1,21 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { View, Linking } from 'react-native'
+import { View } from 'react-native'
 import { Text, Button, HelperText, TextInput } from 'react-native-paper'
-import { subscribeEffect, electron, usingElectron } from '../../electron-wrapper'
-import { loginWithCode as loginWithMyTelegramCode } from '../../../mytelegramorg/scraping'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
-import { resetNavigation } from '../../../utils'
+import { resetNavigationWithHistory } from '../../../utils'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { initializeAPI } from '../../../mtproto/react-native'
+import { sendLoginCode } from '../../../mtproto'
 
 export default function ManualTokensInput() {
   const [phone, setPhone] = React.useState<string>('')
   const [appID, setAppID] = React.useState<string>('')
   const [appHash, setAppHash] = React.useState<string>('')
   const [error, setError] = React.useState<string | null>(null)
+  const [loading, setLoading] = React.useState<boolean>(false)
   const navigation = useNavigation()
   const route = useRoute()
 
@@ -22,22 +24,44 @@ export default function ManualTokensInput() {
     phone && setPhone(phone)
   }, [route.params])
 
-  // const sendCode = async () => {
-  //   if(!code) return setError('Введи код в поле выше')
-  //   setError(null)
-  //   setLoading(true)
+  React.useEffect(() => {
+    if(phone === '8') {
+      setPhone('+7')
+    }
+  }, [phone])
 
-  //   const result = await loginWithMyTelegramCode(phone, random_hash, code)
-  //   setLoading(false)
-  //   if(result.error) {
-  //     setError({
-  //       'incorrect_code': 'Неправильный код'
-  //     }[result.error] ?? result.error)
-  //   } else {
-  //     console.log(result)
-  //     navigation.push('LoginCode')
-  //   }
-  // }
+  React.useEffect(() => {
+    process.env.NODE_ENV === 'development' && setPhone('+79019404698')
+    AsyncStorage.getItem('app_api_id').then(data => setAppID(data))
+    AsyncStorage.getItem('app_api_hash').then(data => setAppHash(data))
+  }, [])
+
+  const saveAndContinue = async () => {
+    if(!phone) return setError('Введите телефон в поле выше')
+    if(!appID) return setError('Введите api_id в поле выше')
+    if(!appHash) return setError('Введите api_hash в поле выше')
+    setError(null)
+    setLoading(true)
+    try {
+      await AsyncStorage.setItem('app_api_id', appID)
+      await AsyncStorage.setItem('app_api_hash', appHash)
+      await initializeAPI()
+      const result = await sendLoginCode(phone)
+      if(result.error) {
+        setError({
+          'phone_number_invalid': 'Некорректный формат номера телефона' 
+        }[result.error] ?? result.error)
+      } else {
+        navigation.push('LoginCode')
+      }
+      resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone } }])
+    } catch(e) {
+      console.error(e)
+      setError(JSON.stringify(e))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Container>
@@ -53,15 +77,17 @@ export default function ManualTokensInput() {
             label='Номер телефона'
             placeholder='Например, +79019404698'
             mode='flat'
+            disabled={loading}
             style={{ marginTop: 10 }}
           />
           <TextInput
             value={appID} 
-            onChangeText={setAppID} 
+            onChangeText={setAppID}
             error={Boolean(error)}
             label='App api_id'
             placeholder='Например, 12345678'
             mode='flat'
+            disabled={loading}
             style={{ marginTop: 10 }}
           />
           <TextInput
@@ -71,22 +97,17 @@ export default function ManualTokensInput() {
             label='App api_hash'
             placeholder='Например, h25jozhmqjf2y85v064dcl'
             mode='flat'
+            disabled={loading}
             style={{ marginTop: 10 }}
           />
           {Boolean(error) && <HelperText type='error' visible={Boolean(error)}>{error}</HelperText>}
           <Button 
             mode='contained'
-            onPress={() => {}} 
+            onPress={saveAndContinue}
+            disabled={loading}
             style={styles.button}
           >
             Сохранить и отправить код
-          </Button>
-          <Button 
-            mode='outlined'
-            style={styles.button}
-            onPress={() => resetNavigation(navigation, 'LoginPhone')}
-          >
-            Отмена
           </Button>
         </View>
       </View>

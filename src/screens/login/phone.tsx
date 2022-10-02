@@ -64,7 +64,7 @@ export default function LoginPhoneScreen() {
             Войти
           </Button>
           <Info />
-          
+          {process.env.NODE_ENV === 'development' && <Button mode='outlined' style={{ marginTop: 10 }} onPress={() => navigation.reset({ routes: [{ name: 'MyTelegramLoginCode', params: { phone: '+79019404698', random_hash: '' } }], index: 0 })}>[[ Дальше ]]</Button>}
         </View>
       </View>
     </Container>

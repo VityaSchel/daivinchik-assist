@@ -1,15 +1,17 @@
-import MTProto from '@mtproto/core'
+import { usingElectron } from '../src/electron-wrapper'
 import { authorizeWithLoginCode, authorizeWith2FA } from './auth'
 import { sendCode } from './utils'
-import log from 'electron-log'
 
-export const api = new MTProto({
-  test: true,
-  api_id: Number(process.env.API_ID),
-  api_hash: process.env.API_HASH,
+const log = {
+  info: console.log
+  //(...args: any) => {
+  // if(usingElectron) {
 
-  storageOptions: { path: './tempdata.json' }
-})
+  // } else {
+  //   console.log(...args)
+  // }
+//}
+}
 
 type State = 'unauthorized'
   | 'pending_code'
@@ -20,7 +22,9 @@ export let state: State = 'unauthorized'
 export async function sendLoginCode(phone: string): Promise<{ phone_code_hash: string, error: null } | { error: 'phone_number_invalid' }> {
   try {
     log.info('Sending Telegram login code to', phone)
-    const { phone_code_hash } = await sendCode(phone)
+    const result = await sendCode(phone)
+    const phone_code_hash = result?.['phone_code_hash']
+    if(!phone_code_hash) return { error: result }
     state = 'pending_code'
     log.info('Sent code to', phone, 'and received hash', phone_code_hash)
     return { phone_code_hash, error: null }
