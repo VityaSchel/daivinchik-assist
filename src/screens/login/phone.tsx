@@ -3,25 +3,38 @@ import { StatusBar } from 'expo-status-bar'
 import { View, Linking } from 'react-native'
 import { Text, Button, HelperText, TextInput } from 'react-native-paper'
 import { subscribeEffect, electron, usingElectron } from '../../electron-wrapper'
+import { sendCode as sendCodeToMyTelegramOrg } from '../../../mytelegramorg/scraping'
 import { useNavigation } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
+import AboutLoginDialog from '../../components/Login/AboutDialog'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
+  const [aboutDialogVisible, setAboutDialogVisible] = React.useState(false)
   const navigation = useNavigation()
 
-  const sendCode = () => {
+  const sendCode = async () => {
     if(!phone) return setError('Введи телефон в поле выше')
     if(!phone.startsWith('+')) return setError('Телефон должен начинаться со знака +')
     setError(null)
     setLoading(true)
-    if(usingElectron) {
-      electron.ipcRenderer.send('login_phone', phone)
-    } else {
+    // if(usingElectron) {
+    //   electron.ipcRenderer.send('my_telegram_login_phone', phone)
+    // } else {
 
+    // }
+    const result = await sendCodeToMyTelegramOrg(phone)
+    setLoading(false)
+    if(result.error) {
+      setError({
+        'too_many_tries': 'Слишком много попыток или некорректный формат телефона'
+      }[result.error] ?? result.error)
+    } else {
+      console.log(result)
+      navigation.push('LoginCode')
     }
   }
 
@@ -31,17 +44,17 @@ export default function LoginPhoneScreen() {
     }
   }, [phone])
 
-  React.useEffect(subscribeEffect('login_phone_result', (_, data: { phone_code_hash?: string, error: string | null }) => {
-    console.log(data)
-    setLoading(false)
-    if(data.error) {
-      setError({
-        'phone_number_invalid': 'Некорректный формат номера телефона' 
-      }[data.error] ?? data.error)
-    } else {
-      navigation.push('LoginCode')
-    }
-  }), [])
+  // React.useEffect(subscribeEffect('login_phone_result', (_, data: { phone_code_hash?: string, error: string | null }) => {
+  //   console.log(data)
+  //   setLoading(false)
+  //   if(data.error) {
+  //     setError({
+  //       'phone_number_invalid': 'Некорректный формат номера телефона' 
+  //     }[data.error] ?? data.error)
+  //   } else {
+  //     navigation.push('LoginCode')
+  //   }
+  // }), [])
 
   return (
     <Container>
@@ -67,6 +80,15 @@ export default function LoginPhoneScreen() {
           >
             Войти
           </Button>
+          <Button 
+            mode='outlined' 
+            onPress={() => setAboutDialogVisible(true)} 
+            style={styles.button}
+            disabled={loading}
+          >
+            Подробнее
+          </Button>
+          <AboutLoginDialog visible={aboutDialogVisible} onHide={() => setAboutDialogVisible(false)} />
           <Text style={styles.warning}>
             Это приложение работает только на вашем телефоне. 
             Ваши данные никогда не будут отправлены за пределы 
