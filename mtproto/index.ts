@@ -29,21 +29,27 @@ export async function sendLoginCode(phone: string): Promise<{ phone_code_hash: s
     log.info('Sent code to', phone, 'and received hash', phone_code_hash)
     return { phone_code_hash, error: null }
   } catch(e) {
+    console.error(e)
     if(e['error_message'] === 'PHONE_NUMBER_INVALID') return { error: 'phone_number_invalid' }
     else throw e
   }
 }
 
-export async function enterLoginCode(phone_code_hash: string, phone: string, code: string): Promise<{ success: boolean; error: 'account_not_found' | 'incorrect_code' | 'incorrect_2fa' | '2fa_password_needed' | null }> { 
-  const result = await authorizeWithLoginCode(phone_code_hash, phone, code)
-  if(result.error) {
-    if(result.error === '2fa_password_needed') state = 'pending_twofa'
-    return { success: false, error: result.error }
+export async function enterLoginCode(phone_code_hash: string, phone: string, code: string): Promise<{ success: boolean; error: 'account_not_found' | 'incorrect_code' | '2fa_password_needed' | string | null }> { 
+  try {
+    const result = await authorizeWithLoginCode(phone_code_hash, phone, code)
+    if(result.error) {
+      if(result.error === '2fa_password_needed') state = 'pending_twofa'
+      return { success: false, error: result.error }
+    }
+    else start(result.user)
+    return { success: true, error: null }
+  } catch(e) {
+    console.error(e)
+    return { success: false, error: JSON.stringify(e) }
   }
-  else start(result.user)
-  return { success: true, error: null }
 }
-export async function enterTwoFACode(code: string) { 
+export async function enterTwoFACode(code: string): Promise<{ success: boolean; error: 'incorrect_2fa' | null }> { 
   const result = await authorizeWith2FA(code)
   if(result.error) return { success: false, error: result.error }
   else start(result.user)

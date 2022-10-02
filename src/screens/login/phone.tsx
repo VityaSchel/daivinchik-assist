@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
 import Info from '../../components/Login/Info'
-import { resetNavigation } from '../../../utils'
+import { resetNavigation, resetNavigationWithHistory } from '../../../utils'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
@@ -63,8 +63,12 @@ export default function LoginPhoneScreen() {
           >
             Войти
           </Button>
-          <Info />
-          {process.env.NODE_ENV === 'development' && <Button mode='outlined' style={{ marginTop: 10 }} onPress={() => navigation.reset({ routes: [{ name: 'MyTelegramLoginCode', params: { phone: '+79019404698', random_hash: '' } }], index: 0 })}>[[ Дальше ]]</Button>}
+          <Info disabled={loading} />
+          {process.env.NODE_ENV === 'development' && 
+            <Button mode='outlined' style={{ marginTop: 10 }} onPress={() => 
+              resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'MyTelegramLoginCode', params: { phone: '+79019404698', random_hash: '' } }])
+            }>[[ Дальше ]]</Button>
+          }
         </View>
       </View>
     </Container>

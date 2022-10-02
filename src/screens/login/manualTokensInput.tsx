@@ -5,7 +5,7 @@ import { Text, Button, HelperText, TextInput } from 'react-native-paper'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
-import { resetNavigationWithHistory } from '../../../utils'
+import { resetNavigation, resetNavigationWithHistory } from '../../../utils'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initializeAPI } from '../../../mtproto/react-native'
 import { sendLoginCode } from '../../../mtproto'
@@ -31,10 +31,15 @@ export default function ManualTokensInput() {
   }, [phone])
 
   React.useEffect(() => {
-    process.env.NODE_ENV === 'development' && setPhone('+79019404698')
+    process.env.NODE_ENV === 'development' && setPhone('+9996610000')
     AsyncStorage.getItem('app_api_id').then(data => setAppID(data))
     AsyncStorage.getItem('app_api_hash').then(data => setAppHash(data))
   }, [])
+
+  React.useEffect(
+    () => navigation.addListener('beforeRemove', (e) => { if (loading) e.preventDefault() }),
+    [navigation, loading]
+  )
 
   const saveAndContinue = async () => {
     if(!phone) return setError('Введите телефон в поле выше')
@@ -52,9 +57,11 @@ export default function ManualTokensInput() {
           'phone_number_invalid': 'Некорректный формат номера телефона' 
         }[result.error] ?? result.error)
       } else {
-        navigation.push('LoginCode')
+        // navigation.reset({ routes: [{ name: 'LoginCode', params: { phone }}], index: 0 })
+        // resetNavigation(navigation, 'LoginCode', { phone })
+        // resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone } }])
+        navigation.push('LoginCode', { phone })
       }
-      resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone } }])
     } catch(e) {
       console.error(e)
       setError(JSON.stringify(e))

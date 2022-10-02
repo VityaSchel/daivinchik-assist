@@ -18,6 +18,11 @@ export default function LoginPhoneScreen() {
   const route = useRoute()
   const { phone, random_hash } = route.params ?? {}
 
+  React.useEffect(
+    () => navigation.addListener('beforeRemove', (e) => { if (loading) e.preventDefault() }),
+    [navigation, loading]
+  )
+
   const sendCode = async () => {
     if(!code) return setError('Введи код в поле выше')
     setError(null)
@@ -41,12 +46,13 @@ export default function LoginPhoneScreen() {
       <View style={styles.container}>
         <View style={styles.innerContainer}>
           <Text variant="headlineLarge" style={{ fontWeight: 'bold' }}>{phone}</Text>
+          <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>Получение токенов</Text>
           <Text style={{ marginVertical: 10 }}>Введи код, который пришел тебе в Telegram</Text>
           <TextInput
             value={code} 
             onChangeText={setCode} 
             error={Boolean(error)} 
-            placeholder='Код'
+            placeholder='Буквенно-числовой код'
             mode='flat'
             disabled={loading}
           />
@@ -67,7 +73,8 @@ export default function LoginPhoneScreen() {
           >
             Не приходит код?
           </Button>
-          <Info />
+          {process.env.NODE_ENV === 'development' && <Button mode='outlined' style={{ marginTop: 10 }} onPress={() => navigation.reset({ routes: [{ name: 'LoginCode', params: { phone: phone, phone_code_hash: 'f9a289bd3b3bcc9ee7' } }], index: 0 })}>[[ Дальше ]]</Button>}
+          <Info disabled={loading} />
         </View>
       </View>
     </Container>

@@ -1,12 +1,9 @@
 import { getUser, sendCode, signIn, getPassword, checkPassword } from './utils'
-// import { api } from './index'
-const api = {}
 
 export async function authorizeWithLoginCode(phone_code_hash: string, phone: string, code: string): Promise<
   { user: object, error: null } 
   | { error: 'account_not_found'
     | 'incorrect_code'
-    | 'incorrect_2fa'
     | '2fa_password_needed' 
   }
 > {
@@ -52,7 +49,7 @@ async function twoFA(password: string) {
   const { srp_id, current_algo, srp_B } = await getPassword()
   const { g, p, salt1, salt2 } = current_algo
 
-  const { A, M1 } = await api.crypto.getSRPParams({
+  const { A, M1 } = await global.api.crypto.getSRPParams({
     g,
     p,
     salt1,

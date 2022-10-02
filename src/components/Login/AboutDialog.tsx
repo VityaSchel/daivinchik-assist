@@ -2,7 +2,7 @@ import { Button, Paragraph, Dialog, Portal, Provider } from 'react-native-paper'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { resetNavigationWithHistory } from '../../../utils'
 
-export default function AboutDialog(props: { visible: boolean, onHide: () => any }) {
+export default function AboutDialog(props: { visible: boolean, onHide: () => any, disabled?: boolean }) {
   const navigation = useNavigation()
 
   return (
@@ -30,8 +30,13 @@ export default function AboutDialog(props: { visible: boolean, onHide: () => any
           </Paragraph>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={() => resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'ManualTokensInput' }])}>Ввести токены вручную</Button>
-          <Button onPress={props.onHide}>ОК</Button>
+          <Button 
+            onPress={() => resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'ManualTokensInput' }])}
+            disabled={props.disabled}
+          >Ввести токены вручную</Button>
+          <Button 
+            onPress={props.onHide}
+          >ОК</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

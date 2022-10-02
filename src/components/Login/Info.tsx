@@ -4,7 +4,7 @@ import AboutLoginDialog from './AboutDialog'
 import styles from '../../styles/Login'
 import { Linking } from 'react-native'
 
-export default function Info() {
+export default function Info(props: { disabled?: boolean }) {
   const [aboutDialogVisible, setAboutDialogVisible] = React.useState(false)
 
   return (
@@ -16,7 +16,11 @@ export default function Info() {
       >
         Подробнее
       </Button>
-      <AboutLoginDialog visible={aboutDialogVisible} onHide={() => setAboutDialogVisible(false)} />
+      <AboutLoginDialog 
+        visible={aboutDialogVisible} 
+        onHide={() => setAboutDialogVisible(false)} 
+        disabled={props.disabled} 
+      />
       <Text style={styles.warning}>
         Это приложение работает только на вашем телефоне. 
         Ваши данные никогда не будут отправлены за пределы 

@@ -1,9 +1,6 @@
-// import { api } from './index'
-const api = {}
-
 export async function getUser(): Promise<object | null> {
   try {
-    const user = await api.call('users.getFullUser', {
+    const user = await global.api.call('users.getFullUser', {
       id: {
         _: 'inputUserSelf',
       },
@@ -24,11 +21,11 @@ export function sendCode(phone: string) {
     settings: {
       _: 'codeSettings',
     },
-  })
+  }, { dcId: 1 })
 }
 
 export function signIn({ code, phone, phone_code_hash }: { code: string, phone: string, phone_code_hash: any }) {
-  return api.call('auth.signIn', {
+  return global.api.call('auth.signIn', {
     phone_code: code,
     phone_number: phone,
     phone_code_hash: phone_code_hash,
@@ -36,7 +33,7 @@ export function signIn({ code, phone, phone_code_hash }: { code: string, phone: 
 }
 
 export function signUp({ phone, phone_code_hash }: { phone: string, phone_code_hash: any }) {
-  return api.call('auth.signUp', {
+  return global.api.call('auth.signUp', {
     phone_number: phone,
     phone_code_hash: phone_code_hash,
     first_name: 'MTProto',
@@ -45,11 +42,11 @@ export function signUp({ phone, phone_code_hash }: { phone: string, phone_code_h
 }
 
 export function getPassword() {
-  return api.call('account.getPassword')
+  return global.api.call('account.getPassword')
 }
 
 export function checkPassword({ srp_id, A, M1 }: { srp_id: any, A: any, M1: any }) {
-  return api.call('auth.checkPassword', {
+  return global.api.call('auth.checkPassword', {
     password: {
       _: 'inputCheckPasswordSRP',
       srp_id,
