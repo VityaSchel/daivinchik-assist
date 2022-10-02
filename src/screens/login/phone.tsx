@@ -8,6 +8,9 @@ import Container from '../../Container'
 import styles from '../../styles/Login'
 import Info from '../../components/Login/Info'
 import { resetNavigation, resetNavigationWithHistory } from '../../../utils'
+import * as SplashScreen from 'expo-splash-screen'
+import { initializeAPI } from '../../../mtproto/react-native'
+import { getUser } from '../../../mtproto/utils'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
@@ -28,7 +31,6 @@ export default function LoginPhoneScreen() {
         'too_many_tries': 'Слишком много попыток или некорректный формат телефона'
       }[result.error] ?? result.error)
     } else {
-      console.log(result)
       resetNavigation(navigation, 'MyTelegramLoginCode', { phone, random_hash: result.random_hash })
     }
   }
@@ -38,6 +40,26 @@ export default function LoginPhoneScreen() {
       setPhone('+7')
     }
   }, [phone])
+
+  React.useEffect(() => {
+    checkAuthState().then(async isAuthentificated => {
+      if(isAuthentificated) {
+        resetNavigation(navigation, 'Feed')
+      }
+      await SplashScreen.hideAsync()
+    })
+  }, [navigation])
+
+  const checkAuthState = async (): Promise<boolean> => {
+    try {
+      await initializeAPI()
+    } catch(e) {
+      return false
+    }
+    const user = await getUser()
+    process.env.NODE_ENV === 'development' && console.log('Authentificated as user', user)
+    return Boolean(user)
+  }
 
   return (
     <Container>

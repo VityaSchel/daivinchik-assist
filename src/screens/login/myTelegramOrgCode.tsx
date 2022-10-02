@@ -36,7 +36,6 @@ export default function MyTelegramLoginScreen() {
         'cookie_not_found': 'Не удалось получить токен сессии для my.telegram.org. Возможно, версия этого приложения устарела, а возможно, Telegram изменил метод работы сайта. Введите токены вручную (нажмите кнопку Подробнее)'
       }[result.error] ?? result.error)
     } else {
-      console.log(result)
       resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'SearchingTokens', params: { phone, sessionToken: result.sessionToken } }])
     }
   }
@@ -74,7 +73,6 @@ export default function MyTelegramLoginScreen() {
           >
             Не приходит код?
           </Button>
-          
           <Info disabled={loading} />
         </View>
       </View>

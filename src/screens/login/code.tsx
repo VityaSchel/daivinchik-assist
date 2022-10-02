@@ -34,7 +34,6 @@ export default function LoginPhoneScreen() {
 
     const result = await enterLoginCode(phone_code_hash, phone, code)
     setLoading(false)
-    console.log(result)
     if(result.error) {
       if(result.error === '2fa_password_needed') {
         console.log('go to 2fa')
@@ -46,22 +45,9 @@ export default function LoginPhoneScreen() {
         }[result.error] ?? result.error)
       }
     } else {
-      console.log(result)
-      navigation.push('LoginCode')
+      navigation.push('Feed')
     }
   }
-
-  // React.useEffect(subscribeEffect('login_phone_result', (_, data: { phone_code_hash?: string, error: string | null }) => {
-  //   console.log(data)
-  //   setLoading(false)
-  //   if(data.error) {
-  //     setError({
-  //       'phone_number_invalid': 'Некорректный формат номера телефона' 
-  //     }[data.error] ?? data.error)
-  //   } else {
-  //     navigation.push('LoginCode')
-  //   }
-  // }), [])
 
   return (
     <Container>

@@ -21,7 +21,7 @@ export function sendCode(phone: string) {
     settings: {
       _: 'codeSettings',
     },
-  }, { dcId: 1 })
+  })
 }
 
 export function signIn({ code, phone, phone_code_hash }: { code: string, phone: string, phone_code_hash: any }) {
@@ -29,7 +29,7 @@ export function signIn({ code, phone, phone_code_hash }: { code: string, phone: 
     phone_code: code,
     phone_number: phone,
     phone_code_hash: phone_code_hash,
-  }, { dcId: 1 })
+  })
 }
 
 export function signUp({ phone, phone_code_hash }: { phone: string, phone_code_hash: any }) {

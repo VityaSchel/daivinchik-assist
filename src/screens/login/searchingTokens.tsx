@@ -31,15 +31,13 @@ export default function SearchingTokens() {
         try {
           await AsyncStorage.setItem('app_api_id', data.appID)
           await AsyncStorage.setItem('app_api_hash', data.appHash)
-          // await initializeAPI()
-          // const result = await sendLoginCode(phone)
-          // if(result.error) {
-          //   setError(result.error)
-          // } else {
-            const result = { phone_code_hash: '' }
+          await initializeAPI()
+          const result = await sendLoginCode(phone)
+          if(result.error) {
+            setError(result.error)
+          } else {
             navigation.push('LoginCode', { phone, phone_code_hash: result.phone_code_hash })
-            // resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone, phone_code_hash: result.phone_code_hash } }])
-          // }
+          }
         } catch(e) {
           setError(JSON.stringify(e))
         }
