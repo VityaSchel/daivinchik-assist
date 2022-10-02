@@ -1,0 +1,130 @@
+diff --git a/envs/react-native/get-local-storage.js b/envs/react-native/get-local-storage.js
+new file mode 100644
+index 0000000..d065a0c
+--- /dev/null
++++ b/envs/react-native/get-local-storage.js
+@@ -0,0 +1,10 @@
++const { AsyncStorage } = require('react-native');
++
++function getLocalStorage() {
++  return {
++    set: AsyncStorage.setItem,
++    get: AsyncStorage.getItem
++  }
++}
++
++module.exports = getLocalStorage;
+diff --git a/envs/react-native/get-random-bytes.js b/envs/react-native/get-random-bytes.js
+new file mode 100644
+index 0000000..b7d4b77
+--- /dev/null
++++ b/envs/react-native/get-random-bytes.js
+@@ -0,0 +1,9 @@
++require('react-native-get-random-values');
++
++function getRandomBytes(length) {
++  const bytes = new Uint8Array(length);
++  crypto.getRandomValues(bytes);
++  return bytes;
++}
++
++module.exports = getRandomBytes;
+diff --git a/envs/react-native/index.js b/envs/react-native/index.js
+new file mode 100644
+index 0000000..558ee1e
+--- /dev/null
++++ b/envs/react-native/index.js
+@@ -0,0 +1,27 @@
++const { polyfillGlobal } = require("react-native/Libraries/Utilities/PolyfillFunctions");
++const { TextEncoder, TextDecoder } = require("web-encoding");
++const makeMTProto = require('../../src');
++const SHA1 = require('./sha1');
++const SHA256 = require('./sha256');
++const PBKDF2 = require('./pbkdf2');
++const Transport = require('./transport');
++const getRandomBytes = require('./get-random-bytes');
++const getLocalStorage = require('./get-local-storage');
++
++polyfillGlobal("TextEncoder", () => TextEncoder);
++polyfillGlobal("TextDecoder", () => TextDecoder);
++
++function createTransport(dc, crypto) {
++  return new Transport(dc, crypto);
++}
++
++const MTProto = makeMTProto({
++  SHA1,
++  SHA256,
++  PBKDF2,
++  getRandomBytes,
++  getLocalStorage,
++  createTransport,
++});
++
++module.exports = MTProto;
+diff --git a/envs/react-native/pbkdf2.js b/envs/react-native/pbkdf2.js
+new file mode 100644
+index 0000000..7e9dba9
+--- /dev/null
++++ b/envs/react-native/pbkdf2.js
+@@ -0,0 +1,7 @@
++const sha256 = require("fast-sha256");
++
++async function PBKDF2(password, salt, iterations) {
++  return sha256.pbkdf2(password, salt, iterations, 512);
++}
++
++module.exports = PBKDF2;
+diff --git a/envs/react-native/sha1.js b/envs/react-native/sha1.js
+new file mode 100644
+index 0000000..9771d97
+--- /dev/null
++++ b/envs/react-native/sha1.js
+@@ -0,0 +1,10 @@
++const jsSHA = require("jssha");
++
++async function SHA1(data) {
++  const format = data instanceof Uint8Array ? "UINT8ARRAY" : "ARRAYBUFFER";
++  const digest = new jsSHA("SHA-1", format)
++  digest.update(data)
++  return digest.getHash("UINT8ARRAY")
++}
++
++module.exports = SHA1;
+\ No newline at end of file
+diff --git a/envs/react-native/sha256.js b/envs/react-native/sha256.js
+new file mode 100644
+index 0000000..84747c4
+--- /dev/null
++++ b/envs/react-native/sha256.js
+@@ -0,0 +1,10 @@
++const jsSHA = require("jssha");
++
++async function SHA256(data) {
++  const format = data instanceof Uint8Array ? "UINT8ARRAY" : "ARRAYBUFFER";
++  const digest = new jsSHA("SHA-256", format)
++  digest.update(data)
++  return digest.getHash("UINT8ARRAY")
++}
++
++module.exports = SHA256;
+\ No newline at end of file
+diff --git a/envs/react-native/transport.js b/envs/react-native/transport.js
+new file mode 100644
+index 0000000..d186583
+--- /dev/null
++++ b/envs/react-native/transport.js
+@@ -0,0 +1 @@
++module.exports = require('../browser/transport');
+\ No newline at end of file
+diff --git a/envs/react-native/index.js b/envs/react-native/index.js
+index 558ee1e..403c84b 100644
+--- a/envs/react-native/index.js
++++ b/envs/react-native/index.js
+@@ -1,5 +1,5 @@
+ const { polyfillGlobal } = require("react-native/Libraries/Utilities/PolyfillFunctions");
+-const { TextEncoder, TextDecoder } = require("web-encoding");
++const { TextEncoder, TextDecoder } = require("text-encoding");
+ const makeMTProto = require('../../src');
+ const SHA1 = require('./sha1');
+ const SHA256 = require('./sha256');

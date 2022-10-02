@@ -4,7 +4,7 @@ import styles from './styles/globals'
 
 export default function Container(props: { children: React.ReactNode }) {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ height: '100%' }}>
       <View style={styles.container}>
         {props.children}
       </View>

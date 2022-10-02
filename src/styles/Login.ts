@@ -8,7 +8,8 @@ export default StyleSheet.create({
     height: '100%'
   },
   innerContainer: {
-    width: '100%'
+    width: '100%',
+    maxWidth: 330
   },
   button: {
     marginTop: 10
