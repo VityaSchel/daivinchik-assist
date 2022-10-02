@@ -42,23 +42,42 @@ export default function LoginPhoneScreen() {
   }, [phone])
 
   React.useEffect(() => {
-    checkAuthState().then(async isAuthentificated => {
-      if(isAuthentificated) {
-        resetNavigation(navigation, 'Feed')
+    checkAuthState().then(async state => {
+      switch(state) {
+        case 'authentificated':
+          resetNavigation(navigation, 'Feed')
+          break
+
+        case '2fa':
+          resetNavigation(navigation, 'TwoFA')
+          break
+
+        default: 
+          break
       }
       await SplashScreen.hideAsync()
     })
   }, [navigation])
 
-  const checkAuthState = async (): Promise<boolean> => {
+  const checkAuthState = async (): Promise<'authentificated' | 'loggedout' | '2fa'> => {
     try {
       await initializeAPI()
     } catch(e) {
       return false
     }
     const user = await getUser()
-    process.env.NODE_ENV === 'development' && console.log('Authentificated as user', user)
-    return Boolean(user)
+    const password = await global.api.call('account.getPassword')
+    console.log(password)
+    if(password?.current_algo) {
+      return '2fa'
+    } else {
+      if(user !== null) {
+        process.env.NODE_ENV === 'development' && console.log('Authentificated as user', user)
+        return 'authentificated'
+      } else {
+        return 'loggedout'
+      }
+    }
   }
 
   return (

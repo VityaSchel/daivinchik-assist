@@ -7,6 +7,7 @@ import LoginCodeScreen from './src/screens/login/code'
 import MyTelegramLoginCodeScreen from './src/screens/login/myTelegramOrgCode'
 import ManualTokensInput from './src/screens/login/manualTokensInput'
 import SearchingTokensScreen from './src/screens/login/searchingTokens'
+import Login2faScreen from './src/screens/login/twofa'
 import FeedScreen from './src/screens/feed'
 import * as SplashScreen from 'expo-splash-screen'
 
@@ -26,6 +27,7 @@ export default function App() {
           <Stack.Screen name='SearchingTokens' component={SearchingTokensScreen} />
           <Stack.Screen name='ManualTokensInput' component={ManualTokensInput} />
           <Stack.Screen name='LoginCode' component={LoginCodeScreen} />
+          <Stack.Screen name='TwoFA' component={Login2faScreen} />
           <Stack.Screen name='Feed' component={FeedScreen} />
         </Stack.Navigator>
       </NavigationContainer>
