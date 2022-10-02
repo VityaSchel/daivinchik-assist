@@ -18,7 +18,6 @@ export default function LoginPhoneScreen() {
   const navigation = useNavigation()
   const route = useRoute()
   const { phone, phone_code_hash } = route.params ?? {}
-  console.log(route.params)
 
   React.useEffect(
     () => navigation.addListener('beforeRemove', (e) => { if (loading) e.preventDefault() }),
@@ -26,8 +25,6 @@ export default function LoginPhoneScreen() {
   )
 
   const sendCode = async () => {
-    if(!phone) return setError('Введи телефон в поле выше')
-    if(!phone.startsWith('+')) return setError('Телефон должен начинаться со знака +')
     setError(null)
     setLoading(true)
     // if(usingElectron) {
@@ -44,7 +41,8 @@ export default function LoginPhoneScreen() {
       } else {
         setError({
           'account_not_found': 'Аккаунт не найден',
-          'incorrect_code': 'Неправильный код'
+          'incorrect_code': 'Неправильный код',
+          'expired_code': 'Истек срок действия кода'
         }[result.error] ?? result.error)
       }
     } else {

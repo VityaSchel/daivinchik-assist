@@ -57,10 +57,7 @@ export default function ManualTokensInput() {
           'phone_number_invalid': 'Некорректный формат номера телефона' 
         }[result.error] ?? result.error)
       } else {
-        // navigation.reset({ routes: [{ name: 'LoginCode', params: { phone }}], index: 0 })
-        // resetNavigation(navigation, 'LoginCode', { phone })
-        // resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone } }])
-        navigation.push('LoginCode', { phone })
+        navigation.push('LoginCode', { phone, phone_code_hash: result.phone_code_hash })
       }
     } catch(e) {
       console.error(e)

@@ -4,7 +4,8 @@ export async function authorizeWithLoginCode(phone_code_hash: string, phone: str
   { user: object, error: null } 
   | { error: 'account_not_found'
     | 'incorrect_code'
-    | '2fa_password_needed' 
+    | '2fa_password_needed'
+    | 'expired_code'
   }
 > {
   try {
@@ -23,8 +24,10 @@ export async function authorizeWithLoginCode(phone_code_hash: string, phone: str
         return { error: '2fa_password_needed' }
 
       case 'PHONE_CODE_INVALID':
-        console.log('Неправильный код! Попробуйте еще раз')
         return { error: 'incorrect_code' }
+
+      case 'PHONE_CODE_EXPIRED':
+        return { error: 'expired_code' }
 
       default:
         throw error

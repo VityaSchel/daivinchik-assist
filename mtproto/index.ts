@@ -35,7 +35,7 @@ export async function sendLoginCode(phone: string): Promise<{ phone_code_hash: s
   }
 }
 
-export async function enterLoginCode(phone_code_hash: string, phone: string, code: string): Promise<{ success: boolean; error: 'account_not_found' | 'incorrect_code' | '2fa_password_needed' | string | null }> { 
+export async function enterLoginCode(phone_code_hash: string, phone: string, code: string): Promise<{ success: boolean; error: 'account_not_found' | 'incorrect_code' | '2fa_password_needed' | 'expired_code' | string | null }> { 
   try {
     const result = await authorizeWithLoginCode(phone_code_hash, phone, code)
     if(result.error) {
