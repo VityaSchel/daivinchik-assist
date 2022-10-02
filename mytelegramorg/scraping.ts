@@ -1,3 +1,4 @@
+import setCookie from 'set-cookie-parser'
 // According to AUTH.md
 
 export async function sendCode(phone: string): Promise<{ error: 'too_many_tries' | string } | { error: null, random_hash: string }> {
@@ -21,7 +22,7 @@ export async function sendCode(phone: string): Promise<{ error: 'too_many_tries'
   }
 }
 
-export async function loginWithCode(phone: string, random_hash: string, code: string): Promise<{ error: 'incorrect_code' | string } | { error: null, sessionToken: string }> {
+export async function loginWithCode(phone: string, random_hash: string, code: string): Promise<{ error: 'incorrect_code' | 'cookie_not_found' | string } | { error: null, sessionToken: string }> {
   const body = new FormData()
   body.append('phone', phone)
   body.append('random_hash', random_hash)
@@ -34,8 +35,15 @@ export async function loginWithCode(phone: string, random_hash: string, code: st
   if(result === 'Invalid confirmation code!') {
     return { error: 'incorrect_code' }
   } else if (result === 'true') {
-    const sessionToken = responseRaw.headers.get('stel_token') as string
-    return { error: null, sessionToken }
+    const rawCookiesHeaders = responseRaw.headers.get('Set-Cookie') as string
+    const splitCookieHeaders = setCookie.splitCookiesString(rawCookiesHeaders)
+    const cookies = setCookie.parse(splitCookieHeaders, { map: true })
+    const sessionToken = cookies['stel_token']?.value
+    if(!sessionToken) {
+      return { error: 'cookie_not_found' }
+    } else {
+      return { error: null, sessionToken }
+    }
   } else {
     return { error: result }
   }

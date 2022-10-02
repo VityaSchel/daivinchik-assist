@@ -32,11 +32,12 @@ export default function LoginPhoneScreen() {
     setLoading(false)
     if(result.error) {
       setError({
-        'incorrect_code': 'Неправильный код'
+        'incorrect_code': 'Неправильный код',
+        'cookie_not_found': 'Не удалось получить токен сессии для my.telegram.org. Возможно, версия этого приложения устарела, а возможно, Telegram изменил метод работы сайта. Введите токены вручную (нажмите кнопку Подробнее)'
       }[result.error] ?? result.error)
     } else {
       console.log(result)
-      navigation.push('LoginCode')
+      resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone } }])
     }
   }
 

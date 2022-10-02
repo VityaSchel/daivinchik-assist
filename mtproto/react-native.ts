@@ -6,7 +6,7 @@ export const initializeAPI = async () => {
   const apiHash = await AsyncStorage.getItem('app_api_hash')
   if(apiID === null || apiHash === null) throw 'API_ID or API_HASH is not specified in app settings'
   const api = new MTProto({
-    test: true,
+    // test: true,
     api_id: Number(apiID),
     api_hash: apiHash
   })
