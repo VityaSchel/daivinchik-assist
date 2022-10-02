@@ -8,6 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
 import Info from '../../components/Login/Info'
+import { resetNavigation } from '../../../utils'
 
 export default function LoginPhoneScreen() {
   const [code, setCode] = React.useState<string>('')
@@ -37,7 +38,7 @@ export default function LoginPhoneScreen() {
   return (
     <Container>
       <StatusBar style="auto" />
-      <View style={styles.container} data-a='1'>
+      <View style={styles.container}>
         <View style={styles.innerContainer}>
           <Text variant="headlineLarge" style={{ fontWeight: 'bold' }}>{phone}</Text>
           <Text style={{ marginVertical: 10 }}>Введи код, который пришел тебе в Telegram</Text>
@@ -62,6 +63,7 @@ export default function LoginPhoneScreen() {
             mode='outlined'
             style={styles.button}
             disabled={loading}
+            onPress={() => resetNavigation(navigation, 'ManualTokensInput', { phone: phone })}
           >
             Не приходит код?
           </Button>

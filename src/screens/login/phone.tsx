@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import Container from '../../Container'
 import styles from '../../styles/Login'
 import Info from '../../components/Login/Info'
+import { resetNavigation } from '../../../utils'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
@@ -28,7 +29,7 @@ export default function LoginPhoneScreen() {
       }[result.error] ?? result.error)
     } else {
       console.log(result)
-      navigation.reset({ routes: [{ name: 'MyTelegramLoginCode', params: { phone, random_hash: result.random_hash } }], index: 0 })
+      resetNavigation(navigation, 'MyTelegramLoginCode', { phone, random_hash: result.random_hash })
     }
   }
 
@@ -41,7 +42,7 @@ export default function LoginPhoneScreen() {
   return (
     <Container>
       <StatusBar style="auto" />
-      <View style={styles.container} data-a='1'>
+      <View style={styles.container}>
         <View style={styles.innerContainer}>
           <Text variant="headlineLarge" style={{ fontWeight: 'bold' }}>Привет!</Text>
           <Text style={{ marginVertical: 10 }}>Введи свой номер телефона от Telegram</Text>
