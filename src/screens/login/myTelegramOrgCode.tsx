@@ -10,7 +10,7 @@ import styles from '../../styles/Login'
 import Info from '../../components/Login/Info'
 import { resetNavigation, resetNavigationWithHistory } from '../../../utils'
 
-export default function LoginPhoneScreen() {
+export default function MyTelegramLoginScreen() {
   const [code, setCode] = React.useState<string>('')
   const [error, setError] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
@@ -37,7 +37,7 @@ export default function LoginPhoneScreen() {
       }[result.error] ?? result.error)
     } else {
       console.log(result)
-      resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'LoginCode', params: { phone } }])
+      resetNavigationWithHistory(navigation, [{ name: 'LoginPhone' }, { name: 'SearchingTokens', params: { phone, sessionToken: result.sessionToken } }])
     }
   }
 
@@ -74,7 +74,7 @@ export default function LoginPhoneScreen() {
           >
             Не приходит код?
           </Button>
-          {process.env.NODE_ENV === 'development' && <Button mode='outlined' style={{ marginTop: 10 }} onPress={() => navigation.reset({ routes: [{ name: 'LoginCode', params: { phone: phone, phone_code_hash: 'f9a289bd3b3bcc9ee7' } }], index: 0 })}>[[ Дальше ]]</Button>}
+          
           <Info disabled={loading} />
         </View>
       </View>

@@ -1,5 +1,7 @@
-import setCookie from 'set-cookie-parser'
 // According to AUTH.md
+import setCookie from 'set-cookie-parser'
+import { parse } from 'node-html-parser'
+import cookie from 'cookie'
 
 export async function sendCode(phone: string): Promise<{ error: 'too_many_tries' | string } | { error: null, random_hash: string }> {
   const body = new FormData()
@@ -47,4 +49,19 @@ export async function loginWithCode(phone: string, random_hash: string, code: st
   } else {
     return { error: result }
   }
+}
+
+export async function obtainTokens(sessionToken: string): Promise<{ appID: string, appHash: string }> {
+  const responseRaw = await fetch('https://my.telegram.org/apps', {
+    method: 'GET',
+    headers: {
+      'Cookie': cookie.serialize('stel_token', sessionToken)
+    }
+  })
+  const root = parse(await responseRaw.text())
+  const appIDEl = root.querySelector('[for=app_id]+div > span > strong')
+  if(!appIDEl) throw 'Unable to find app id element'
+  const appHashEl = root.querySelector('[for=app_hash]+div > span')
+  if(!appHashEl) throw 'Unable to find app hash element'
+  return { appID: appIDEl.innerText, appHash: appHashEl.innerText }
 }
