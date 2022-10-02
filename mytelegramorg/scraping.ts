@@ -20,3 +20,23 @@ export async function sendCode(phone: string): Promise<{ error: 'too_many_tries'
     }
   }
 }
+
+export async function loginWithCode(phone: string, random_hash: string, code: string): Promise<{ error: 'incorrect_code' | string } | { error: null, sessionToken: string }> {
+  const body = new FormData()
+  body.append('phone', phone)
+  body.append('random_hash', random_hash)
+  body.append('password', code)
+  const responseRaw = await fetch('https://my.telegram.org/auth/login', {
+    method: 'POST',
+    body
+  })
+  const result = await responseRaw.text()
+  if(result === 'Invalid confirmation code!') {
+    return { error: 'incorrect_code' }
+  } else if (result === 'true') {
+    const sessionToken = responseRaw.headers.get('stel_token') as string
+    return { error: null, sessionToken }
+  } else {
+    return { error: result }
+  }
+}

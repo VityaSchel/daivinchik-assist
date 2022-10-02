@@ -11,6 +11,9 @@ export default StyleSheet.create({
     width: '100%',
     maxWidth: 330
   },
+  moreInfoButton: {
+    marginTop: 10
+  },
   button: {
     marginTop: 10
   },
