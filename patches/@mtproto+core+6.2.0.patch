@@ -1,8 +1,8 @@
-diff --git a/envs/react-native/get-local-storage.js b/envs/react-native/get-local-storage.js
+diff --git a/node_modules/@mtproto/core/envs/react-native/get-local-storage.js b/node_modules/@mtproto/core/envs/react-native/get-local-storage.js
 new file mode 100644
 index 0000000..d065a0c
 --- /dev/null
-+++ b/envs/react-native/get-local-storage.js
++++ b/node_modules/@mtproto/core/envs/react-native/get-local-storage.js
 @@ -0,0 +1,10 @@
 +const { AsyncStorage } = require('react-native');
 +
@@ -14,11 +14,11 @@ index 0000000..d065a0c
 +}
 +
 +module.exports = getLocalStorage;
-diff --git a/envs/react-native/get-random-bytes.js b/envs/react-native/get-random-bytes.js
+diff --git a/node_modules/@mtproto/core/envs/react-native/get-random-bytes.js b/node_modules/@mtproto/core/envs/react-native/get-random-bytes.js
 new file mode 100644
 index 0000000..b7d4b77
 --- /dev/null
-+++ b/envs/react-native/get-random-bytes.js
++++ b/node_modules/@mtproto/core/envs/react-native/get-random-bytes.js
 @@ -0,0 +1,9 @@
 +require('react-native-get-random-values');
 +
@@ -29,14 +29,14 @@ index 0000000..b7d4b77
 +}
 +
 +module.exports = getRandomBytes;
-diff --git a/envs/react-native/index.js b/envs/react-native/index.js
+diff --git a/node_modules/@mtproto/core/envs/react-native/index.js b/node_modules/@mtproto/core/envs/react-native/index.js
 new file mode 100644
-index 0000000..558ee1e
+index 0000000..94f0af7
 --- /dev/null
-+++ b/envs/react-native/index.js
++++ b/node_modules/@mtproto/core/envs/react-native/index.js
 @@ -0,0 +1,27 @@
 +const { polyfillGlobal } = require("react-native/Libraries/Utilities/PolyfillFunctions");
-+const { TextEncoder, TextDecoder } = require("web-encoding");
++const { TextEncoder, TextDecoder } = require("text-encoding");
 +const makeMTProto = require('../../src');
 +const SHA1 = require('./sha1');
 +const SHA256 = require('./sha256');
@@ -62,11 +62,12 @@ index 0000000..558ee1e
 +});
 +
 +module.exports = MTProto;
-diff --git a/envs/react-native/pbkdf2.js b/envs/react-native/pbkdf2.js
+\ No newline at end of file
+diff --git a/node_modules/@mtproto/core/envs/react-native/pbkdf2.js b/node_modules/@mtproto/core/envs/react-native/pbkdf2.js
 new file mode 100644
 index 0000000..7e9dba9
 --- /dev/null
-+++ b/envs/react-native/pbkdf2.js
++++ b/node_modules/@mtproto/core/envs/react-native/pbkdf2.js
 @@ -0,0 +1,7 @@
 +const sha256 = require("fast-sha256");
 +
@@ -75,11 +76,11 @@ index 0000000..7e9dba9
 +}
 +
 +module.exports = PBKDF2;
-diff --git a/envs/react-native/sha1.js b/envs/react-native/sha1.js
+diff --git a/node_modules/@mtproto/core/envs/react-native/sha1.js b/node_modules/@mtproto/core/envs/react-native/sha1.js
 new file mode 100644
 index 0000000..9771d97
 --- /dev/null
-+++ b/envs/react-native/sha1.js
++++ b/node_modules/@mtproto/core/envs/react-native/sha1.js
 @@ -0,0 +1,10 @@
 +const jsSHA = require("jssha");
 +
@@ -92,11 +93,11 @@ index 0000000..9771d97
 +
 +module.exports = SHA1;
 \ No newline at end of file
-diff --git a/envs/react-native/sha256.js b/envs/react-native/sha256.js
+diff --git a/node_modules/@mtproto/core/envs/react-native/sha256.js b/node_modules/@mtproto/core/envs/react-native/sha256.js
 new file mode 100644
 index 0000000..84747c4
 --- /dev/null
-+++ b/envs/react-native/sha256.js
++++ b/node_modules/@mtproto/core/envs/react-native/sha256.js
 @@ -0,0 +1,10 @@
 +const jsSHA = require("jssha");
 +
@@ -109,22 +110,11 @@ index 0000000..84747c4
 +
 +module.exports = SHA256;
 \ No newline at end of file
-diff --git a/envs/react-native/transport.js b/envs/react-native/transport.js
+diff --git a/node_modules/@mtproto/core/envs/react-native/transport.js b/node_modules/@mtproto/core/envs/react-native/transport.js
 new file mode 100644
 index 0000000..d186583
 --- /dev/null
-+++ b/envs/react-native/transport.js
++++ b/node_modules/@mtproto/core/envs/react-native/transport.js
 @@ -0,0 +1 @@
 +module.exports = require('../browser/transport');
 \ No newline at end of file
-diff --git a/envs/react-native/index.js b/envs/react-native/index.js
-index 558ee1e..403c84b 100644
---- a/envs/react-native/index.js
-+++ b/envs/react-native/index.js
-@@ -1,5 +1,5 @@
- const { polyfillGlobal } = require("react-native/Libraries/Utilities/PolyfillFunctions");
--const { TextEncoder, TextDecoder } = require("web-encoding");
-+const { TextEncoder, TextDecoder } = require("text-encoding");
- const makeMTProto = require('../../src');
- const SHA1 = require('./sha1');
- const SHA256 = require('./sha256');
