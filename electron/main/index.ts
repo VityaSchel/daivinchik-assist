@@ -4,7 +4,7 @@ import './.env'
 import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
-import { sendLoginCode, enterLoginCode, enterTwoFACode } from './mtproto/index'
+import { sendLoginCode, enterLoginCode, enterTwoFACode } from '../../mtproto/index'
 import fs from 'fs'
 import log from 'electron-log'
 
