@@ -1,15 +1,22 @@
 diff --git a/node_modules/@mtproto/core/envs/react-native/get-local-storage.js b/node_modules/@mtproto/core/envs/react-native/get-local-storage.js
 new file mode 100644
-index 0000000..d065a0c
+index 0000000..f2ad648
 --- /dev/null
 +++ b/node_modules/@mtproto/core/envs/react-native/get-local-storage.js
-@@ -0,0 +1,10 @@
-+const { AsyncStorage } = require('react-native');
+@@ -0,0 +1,17 @@
++import AsyncStorage from '@react-native-async-storage/async-storage'
 +
 +function getLocalStorage() {
 +  return {
-+    set: AsyncStorage.setItem,
-+    get: AsyncStorage.getItem
++    set: (key, value) => {
++      console.log('MTProto Storage: setting', key, 'to', value)
++      return AsyncStorage.setItem(key, value)
++    },
++    get: async (key) => {
++      const result = await AsyncStorage.getItem(key)
++      console.log('MTProto Storage: reading', key, 'result', result)
++      return result
++    }
 +  }
 +}
 +
