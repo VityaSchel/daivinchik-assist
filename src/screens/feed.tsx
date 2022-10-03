@@ -7,11 +7,13 @@ import { resetNavigation } from '../../utils'
 import { getSelfPhoto, getUser } from '../../mtproto/utils'
 import styles from '../styles/Feed'
 import LoadHistory from '../components/Feed/LoadHistory'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function FeedScreen() {
   const navigation = useNavigation()
   const [user, setUser] = React.useState<object | null>(null)
   const [profilePictureBase64, setProfilePictureBase64] = React.useState<string | null>(null)
+  const [state, setState] = React.useState<'setup' | 'ready' | null>(null)
 
   React.useEffect(() => {
     if(navigation.getState().routes.length > 1)
@@ -20,6 +22,7 @@ export default function FeedScreen() {
 
   React.useEffect(() => {
     fetchUser()
+    checkState()
   }, [])
 
   const fetchUser = async () => {
@@ -29,13 +32,21 @@ export default function FeedScreen() {
     setUser(user)
 
     const photoID = user['photo']['photo_id']
-    // if(photoID) {
-    //   const profilePhotoBuffer = await getSelfPhoto(photoID)
-    //   console.log(profilePhotoBuffer.length)
-    //   setProfilePictureBase64('data:image/jpeg;base64,' + profilePhotoBuffer.toString('base64'))
-    // }
+    if(photoID) {
+      const profilePhotoBuffer = await getSelfPhoto(photoID)
+      console.log(profilePhotoBuffer.length)
+      setProfilePictureBase64('data:image/jpeg;base64,' + profilePhotoBuffer.toString('base64'))
+    }
   }
 
+  const checkState = async () => {
+    const setupState = await AsyncStorage.getItem('init_history_export_state')
+    if(setupState === 'finished') {
+      setState('ready')
+    } else {
+      setState('setup')
+    }
+  }
   
   if(!user) return <View></View>
 
@@ -52,7 +63,8 @@ export default function FeedScreen() {
           style={styles.logout}
         >Выйти</Button>
       </View>
-      <LoadHistory />
+      {state === 'setup' && <LoadHistory onDone={checkState} />}
+      {state === 'ready' && <Text>Ready!</Text>}
     </Container>
   )
 }

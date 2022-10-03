@@ -5,7 +5,7 @@ import { exportHistory, findLeomatchPeer } from '../../../mtproto/importBotHisto
 import AboutDialog from './AboutDialog'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export default function LoadHistory() {
+export default function LoadHistory(props: { onDone: () => any }) {
   const [howItWorksDialogVisible, setHowItWorksDialogVisibility] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<null | string>(null)
@@ -30,10 +30,11 @@ export default function LoadHistory() {
         setProgress(exported / max)
         AsyncStorage.setItem('init_history_exported_msgs_process', JSON.stringify({ exported, max, offset }))
       }
-      const { abort } = exportHistory(result.peer, callback, continueFrom?.offset)
+      const { abort, promise } = exportHistory(result.peer, callback, continueFrom?.offset)
       // Dirty trick that pollutes global space.
       // TODO: Replace and avoid
       global.__INIT_LOAD_HISTORY_ABORT = abort
+      promise.then(finished)
     }
   }
 
@@ -49,16 +50,21 @@ export default function LoadHistory() {
       } else {
         try {
           const data = JSON.parse(dataRaw)
-          console.log(data)
-          setContinueFrom({
-            exported: Number(data.exported) || 0,
-            max: Number(data.max) || 1,
-            offset: Number(data.offset) || undefined
-          })
+          if(Number(data.exported) >= Number(data.max)) {
+            finished()
+          } else {
+            setContinueFrom({
+              exported: Number(data.exported) || 0,
+              max: Number(data.max) || 1,
+              offset: Number(data.offset) || undefined
+            })
+          }
         } catch(e) {
           setContinueFrom(null)
         }
       }
+    } else if (state === 'finished') {
+      props.onDone()
     } else {
       setContinueFrom(null)
     }
@@ -69,6 +75,13 @@ export default function LoadHistory() {
     global['__INIT_LOAD_HISTORY_ABORT']?.()
     setExporting(false)
     checkState()
+  }
+
+  const finished = async () => {
+    await AsyncStorage.setItem('init_history_export_state', 'finished')
+    setExporting(false)
+    setLoading(true)
+    props.onDone()
   }
   
   return (

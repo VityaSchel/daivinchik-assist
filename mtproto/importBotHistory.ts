@@ -75,7 +75,7 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
           break
         }
     
-      } while(messagesList.length < max && messagesList.length < 100 && !abortSignal)
+      } while(messagesList.length < max && !abortSignal)
       resolve()
     }),
     abort: () => { abortSignal = true }
