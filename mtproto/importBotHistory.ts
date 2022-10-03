@@ -1,3 +1,5 @@
+import { TextEncoder, TextDecoder } from 'text-encoding'
+
 type Peer = { id: string, access_hash: string }
 
 export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_peer' | string } | { peer: Peer, error: null }> {
@@ -23,40 +25,65 @@ export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_pe
   }
 }
 
-export async function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number) {
-  const pageSize = 5
-  const messagesList = []
+// const maxStorageSize = 
+
+export function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number) {
+  const pageSize = 100
+  const messagesList: object[] = []
   let offset = Number.isInteger(offset_) ? offset_ : undefined
-  let max
+  let max: number
+  let abortSignal = false
 
-  do {
-    console.log('Calling export history with offset', offset, 'and limit', pageSize)
-    const history = await global.api.call('messages.getHistory', {
-      peer: {
-        _: 'inputPeerUser',
-        user_id: leomatchPeer.id,
-        access_hash: leomatchPeer.access_hash,
-      },
-      offset_id: offset,
-      limit: pageSize
-    })
-    const messages = history.messages
-    console.log('Saved', messages.length, 'messages')
+  return {
+    promise: new Promise<void>(async (resolve) => {
+      do {
+        console.log('Calling export history with offset', offset, 'and limit', pageSize)
+        const history = await global.api.call('messages.getHistory', {
+          peer: {
+            _: 'inputPeerUser',
+            user_id: leomatchPeer.id,
+            access_hash: leomatchPeer.access_hash,
+          },
+          offset_id: offset,
+          limit: pageSize
+        })
+        if(abortSignal) break
 
-    if(offset === undefined) max = history.count
-
-    if(messages.length > 0) {
-      offset = messages[messages.length - 1].id
-    }
-
-    callback(messagesList.length, max, offset ?? 0)
+        const messages = filterNecessaryData(history.messages)
+        console.log('Saved', messages.length, 'messages')
     
-    if(messages.length > 0)
-      messagesList.push(...messages)
-    else
-      break
+        if(offset === undefined || offset_ !== undefined) max = history.count
+    
+        if(messages.length > 0) {
+          offset = messages[messages.length - 1].id
+        }
+    
+        callback(messagesList.length, max, offset ?? 0)
+        
+        if(messages.length > 0) {
+          messagesList.push(...messages)
+          const messagesListSerialized = JSON.stringify(messagesList)
+          const bytesLength = (new TextEncoder()).encode(messagesListSerialized).length
+          console.log(bytesLength)
+          // if(bytesLength/1024 > maxStorageSize)
+        } else {
+          break
+        }
+    
+      } while(messagesList.length < max && messagesList.length < 100 && !abortSignal)
+      resolve()
+    }),
+    abort: () => { abortSignal = true }
+  }
+}
 
-  } while(messagesList.length < max && messagesList.length < 10)
-
-  console.log(JSON.stringify(messagesList))
+function filterNecessaryData(messages: object[]) {
+  return messages
+    .filter(msg => msg._ === 'message')
+    .map(msg => ({
+      o: msg['out'] ? 1 : 0,
+      t: msg['message'],
+      d: msg['date'],
+      ...(msg['media'] && { m: 1 })
+    }))
 }
