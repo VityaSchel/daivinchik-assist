@@ -50,6 +50,7 @@ export default function TwoFaLoginScreen() {
             placeholder='Пароль'
             mode='flat'
             disabled={loading}
+            secureTextEntry
           />
           {Boolean(error) && <HelperText type='error' visible={Boolean(error)}>{error}</HelperText>}
           <Button

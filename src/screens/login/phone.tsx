@@ -10,7 +10,7 @@ import Info from '../../components/Login/Info'
 import { resetNavigation, resetNavigationWithHistory } from '../../../utils'
 import * as SplashScreen from 'expo-splash-screen'
 import { initializeAPI } from '../../../mtproto/react-native'
-import { getUser } from '../../../mtproto/utils'
+import { getPassword, getUser } from '../../../mtproto/utils'
 
 export default function LoginPhoneScreen() {
   const [phone, setPhone] = React.useState('')
@@ -63,10 +63,10 @@ export default function LoginPhoneScreen() {
     try {
       await initializeAPI()
     } catch(e) {
-      return false
+      return 'loggedout'
     }
     const user = await getUser()
-    const password = await global.api.call('account.getPassword')
+    const password = await getPassword()
     console.log(password)
     if(password?.current_algo) {
       return '2fa'

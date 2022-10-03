@@ -41,8 +41,14 @@ export function signUp({ phone, phone_code_hash }: { phone: string, phone_code_h
   })
 }
 
-export function getPassword() {
-  return global.api.call('account.getPassword')
+export async function getPassword(invalidateCache = false) {
+  if(!invalidateCache && global.api.__account_password) return global.api.__account_password
+
+  const result = await global.api.call('account.getPassword')
+  if(result._ === 'account.password') {
+    global.api.__account_password = result
+    return result
+  }
 }
 
 export function checkPassword({ srp_id, A, M1 }: { srp_id: any, A: any, M1: any }) {

@@ -49,9 +49,10 @@ export async function authorizeWith2FA(twoFApassword: string): Promise<
 }
 
 async function twoFA(password: string) {
+  console.log('u')
   const { srp_id, current_algo, srp_B } = await getPassword()
   const { g, p, salt1, salt2 } = current_algo
-
+  console.log('t')
   const { A, M1 } = await global.api.crypto.getSRPParams({
     g,
     p,
@@ -60,6 +61,6 @@ async function twoFA(password: string) {
     gB: srp_B,
     password: password,
   })
-
+  console.log('e')
   await checkPassword({ srp_id, A, M1 })
 }
