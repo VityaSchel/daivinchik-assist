@@ -1,4 +1,6 @@
 import { TextEncoder, TextDecoder } from 'text-encoding'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import _ from 'lodash'
 
 type Peer = { id: string, access_hash: string }
 
@@ -25,7 +27,8 @@ export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_pe
   }
 }
 
-// const maxStorageSize = 
+const maxStorageSize = 4000000
+const maxChunkSize = 1000000
 
 export function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number) {
   const pageSize = 100
@@ -62,11 +65,13 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
         
         if(messages.length > 0) {
           messagesList.push(...messages)
-          const messagesListSerialized = JSON.stringify(messagesList)
-          const bytesLength = (new TextEncoder()).encode(messagesListSerialized).length
-          console.log(bytesLength)
-          // if(bytesLength/1024 > maxStorageSize)
+          const bytesLength = (new TextEncoder()).encode(JSON.stringify(messagesList)).length
+          await saveMessagesLocally(messagesList)
+          if(bytesLength/1024 > maxStorageSize) {
+            break
+          }
         } else {
+          saveMessagesLocally(messagesList)
           break
         }
     
@@ -75,6 +80,21 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
     }),
     abort: () => { abortSignal = true }
   }
+}
+
+const const_name = 'init_history_exported_msgs_tmp_'
+async function saveMessagesLocally(messages: object[]) {
+  const messagesSerialized = JSON.stringify(messages)
+  // const messagesSerializedRaw = (new TextEncoder()).encode(JSON.stringify(messagesSerialized))
+  // const messagesSerializedRawChunks = _.chunk(messagesSerializedRaw, maxChunkSize)
+  // splitting characters in separate bytes => may be dangerous 
+  // messagesSerializedRawChunks.map(chunk => )
+  const maxChars = maxChunkSize / 2 // each char is 1-4 bytes, 2 is average
+  const messagesSerializedChunksSplitted = _.chunk(messagesSerialized, maxChars)
+  const messagesSerializedChunks = messagesSerializedChunksSplitted.map(splittedPart => splittedPart.join(''))
+  const keyValuePairs: [string, string][] = messagesSerializedChunks.map((value, i) => [const_name + i, value])
+  await AsyncStorage.multiSet(keyValuePairs)
+  await AsyncStorage.removeItem(const_name + keyValuePairs.length)
 }
 
 function filterNecessaryData(messages: object[]) {
