@@ -22,8 +22,8 @@ export default function Info(props: { disabled?: boolean }) {
         disabled={props.disabled} 
       />
       <Text style={styles.warning}>
-        Это приложение работает только на вашем телефоне. 
-        Ваши данные никогда не будут отправлены за пределы 
+        Это приложение работает только на твоем телефоне. 
+        Твои данные никогда не будут отправлены за пределы 
         этого устройства. <Text 
           style={styles.link}
           onPress={() => Linking.openURL('https://github.com/VityaSchel/daivinchik-assist')}
