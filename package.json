@@ -26,6 +26,7 @@
     "@react-navigation/native-stack": "^6.9.0",
     "aboba": "^1.0.1",
     "babel-plugin-replace-imports": "^1.0.2",
+    "buffer": "^6.0.3",
     "cookie": "^0.5.0",
     "expo": "~46.0.13",
     "expo-splash-screen": "~0.16.2",

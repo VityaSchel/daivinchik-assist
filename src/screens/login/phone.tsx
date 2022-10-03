@@ -55,7 +55,7 @@ export default function LoginPhoneScreen() {
         default: 
           break
       }
-      await SplashScreen.hideAsync()
+      setTimeout(() => SplashScreen.hideAsync(), 500)
     })
   }, [navigation])
 
@@ -65,9 +65,8 @@ export default function LoginPhoneScreen() {
     } catch(e) {
       return 'loggedout'
     }
-    const user = await getUser()
+    const user = await getUser(true)
     const password = await getPassword()
-    console.log(password)
     if(password?.current_algo) {
       return '2fa'
     } else {
