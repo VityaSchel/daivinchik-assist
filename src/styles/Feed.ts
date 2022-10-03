@@ -8,15 +8,12 @@ export default StyleSheet.create({
   userInfo: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     width: '100%',
-    flexWrap: 'wrap'
+    justifyContent: 'flex-start',
+    alignItems: 'center'
   },
   logout: {
-    // marginLeft: 10
-    // float: 'right'
-    // justifyContent: 'flex-end'
-    // self: 'flex-end'
     marginLeft: 'auto'
   }
 })

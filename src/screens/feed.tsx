@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { resetNavigation } from '../../utils'
 import { getSelfPhoto, getUser } from '../../mtproto/utils'
 import styles from '../styles/Feed'
+import LoadHistory from '../components/Feed/LoadHistory'
 
 export default function FeedScreen() {
   const navigation = useNavigation()
@@ -28,12 +29,13 @@ export default function FeedScreen() {
     setUser(user)
 
     const photoID = user['photo']['photo_id']
-    if(photoID) {
-      const profilePhotoBuffer = await getSelfPhoto(photoID)
-      console.log(profilePhotoBuffer.length)
-      setProfilePictureBase64('data:image/jpeg;base64,' + profilePhotoBuffer.toString('base64'))
-    }
+    // if(photoID) {
+    //   const profilePhotoBuffer = await getSelfPhoto(photoID)
+    //   console.log(profilePhotoBuffer.length)
+    //   setProfilePictureBase64('data:image/jpeg;base64,' + profilePhotoBuffer.toString('base64'))
+    // }
   }
+
   
   if(!user) return <View></View>
 
@@ -41,7 +43,8 @@ export default function FeedScreen() {
     <Container>
       <View style={styles.userInfo}>
         {profilePictureBase64 && <Image style={styles.pfp} source={{ uri: profilePictureBase64, width: 30, height: 30 }} />}
-        <Text variant='bodyMedium'>{user['first_name']} {user['last_name']}</Text>
+        <Text variant='bodyMedium' style={{ marginRight: 5 }}>{user['first_name']}</Text>
+        <Text variant='bodyMedium'>{user['last_name']}</Text>
         <Button 
           mode='text' 
           compact 
@@ -49,6 +52,7 @@ export default function FeedScreen() {
           style={styles.logout}
         >Выйти</Button>
       </View>
+      <LoadHistory />
     </Container>
   )
 }
