@@ -126,3 +126,5 @@ dist
 # @end @expo/electron-adapter
 
 tempdata.json
+credentials.json
+*.keystore

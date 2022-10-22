@@ -1,0 +1,36 @@
+{
+  "cli": {
+    "version": ">= 0.55.1"
+  },
+  "build": {
+    "development": {
+      "credentialsSource": "local",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "ANDROID_SDK_ROOT": "/usr/local/bin/android-sdk"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "credentialsSource": "local",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "ANDROID_SDK_ROOT": "/usr/local/bin/android-sdk"
+      }
+    },
+    "production": {
+      "credentialsSource": "local",
+      "env": {
+        "ANDROID_SDK_ROOT": "/usr/local/bin/android-sdk"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

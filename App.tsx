@@ -1,5 +1,5 @@
 import React from 'react'
-import { Provider } from 'react-native-paper'
+import { Provider, MD3LightTheme } from 'react-native-paper'
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LoginPhoneScreen from './src/screens/login/phone'
@@ -10,6 +10,8 @@ import SearchingTokensScreen from './src/screens/login/searchingTokens'
 import Login2faScreen from './src/screens/login/twofa'
 import FeedScreen from './src/screens/feed'
 import * as SplashScreen from 'expo-splash-screen'
+import { MessageRealmContext } from './src/models/index'
+import { Button } from 'react-native'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -19,7 +21,22 @@ const navigationRef = createNavigationContainerRef()
 
 export default function App() {
   return (
-    <Provider>
+    <MessageRealmContext.RealmProvider>
+      <Main />
+    </MessageRealmContext.RealmProvider>
+  )
+}
+
+function Main() {
+  const realm = MessageRealmContext.useRealm()
+  console.log('1', realm)
+
+  React.useEffect(() => {
+    global.realm = realm
+  }, [realm])
+
+  return (
+    <Provider theme={MD3LightTheme}>
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={{ headerShown: false }} >
           <Stack.Screen name='LoginPhone' component={LoginPhoneScreen} />
@@ -33,8 +50,4 @@ export default function App() {
       </NavigationContainer>
     </Provider>
   )
-}
-
-function test(arg1: string) {
-  //
 }

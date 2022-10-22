@@ -4,6 +4,7 @@ import { ProgressBar, Button, HelperText, Text } from 'react-native-paper'
 import { exportHistory, findLeomatchPeer } from '../../../mtproto/importBotHistory'
 import AboutDialog from './AboutDialog'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { MessageRealmContext } from '../../models'
 
 export default function LoadHistory(props: { onDone: () => any }) {
   const [howItWorksDialogVisible, setHowItWorksDialogVisibility] = React.useState(false)
@@ -12,6 +13,7 @@ export default function LoadHistory(props: { onDone: () => any }) {
   const [progress, setProgress] = React.useState(0)
   const [continueFrom, setContinueFrom] = React.useState<null | { exported: number, max: number, offset: number | undefined }>(null)
   const [exporting, setExporting] = React.useState(false)
+  const realm = MessageRealmContext.useRealm()
 
   const loadHistory = async () => {
     setLoading(true)
@@ -83,6 +85,14 @@ export default function LoadHistory(props: { onDone: () => any }) {
     setLoading(true)
     props.onDone()
   }
+
+  const _dev_clearStorage = () => {
+    AsyncStorage.removeItem('init_history_export_state')
+    AsyncStorage.removeItem('init_history_exported_msgs_process')
+    realm.write(() => {
+      realm.delete(realm.objects('Message'))
+    })
+  }
   
   return (
     <View style={{ marginTop: 50 }}>
@@ -138,7 +148,7 @@ export default function LoadHistory(props: { onDone: () => any }) {
       <AboutDialog visible={howItWorksDialogVisible} onHide={() => setHowItWorksDialogVisibility(false)} />
       <Button 
         mode='outlined'
-        onPress={() => { AsyncStorage.removeItem('init_history_export_state') ; AsyncStorage.removeItem('init_history_exported_msgs_process') }}
+        onPress={() => _dev_clearStorage()}
         style={{ marginTop: 10 }}
       >[[ undo ]]</Button>
     </View>
