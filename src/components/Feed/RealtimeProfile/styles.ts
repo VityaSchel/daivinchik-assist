@@ -59,6 +59,21 @@ export default StyleSheet.create({
   instagramContainer: {
     borderBottomWidth: 2,
     borderColor: '#ccc',
-    maxHeight: 100
+    height: 450,
+    // marginTop: 5
+  },
+  instagram: {
+    marginTop: 30
+  },
+  instagramTitle: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  instagramActions: {
+    marginLeft: 'auto',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center'
   }
 })
