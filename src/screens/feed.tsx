@@ -81,7 +81,7 @@ export default function FeedScreen() {
       <Button 
         mode='outlined'
         onPress={() => _dev_clearStorage()}
-        style={{ marginTop: 10 }}
+        style={{ marginTop: 400 }}
       >[[ Clear messages storage ]]</Button>
     </Container>
   )

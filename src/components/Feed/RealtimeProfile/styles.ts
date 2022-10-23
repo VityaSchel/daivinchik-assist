@@ -14,12 +14,37 @@ export default StyleSheet.create({
   miniProfile: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 20
+  },
+  pfpPlaceholder: {
+    width: 100
+  },
+  pfp: {
+    borderRadius: 15
+  },
+  info: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    marginLeft: 20,
+    height: 100,
+  },
 
-    info: {
-      display: 'flex',
-      flex: 1,
-      marginLeft: 20
-    }
+  infoAge: {
+    // marginTop: 'auto',
+    color: '#888'
+  },
+  
+  infoText: {
+    marginTop: 5,
+    color: '#888',
+    fontStyle: 'italic',
+    
+  },
+  bold: {
+    fontWeight: 'bold'
+  },
+  interactions: {
+    marginTop: 30
   }
 })

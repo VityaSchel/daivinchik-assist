@@ -1,20 +1,16 @@
 import React from 'react'
-import { Image, View } from 'react-native'
+import { Image, ScrollView, View } from 'react-native'
 import { Text } from 'react-native-paper'
 import { onMessage } from '../../../../mtproto/updates'
 import { getPhoto } from '../../../../mtproto/utils'
 import { detectMessageType, userProfileRegex } from '../../../models/Message'
 import { Message } from '../../../ts/MessageSchema'
 import styles from './styles'
-import {
-  Placeholder,
-  PlaceholderMedia,
-  PlaceholderLine,
-  Fade
-} from 'rn-placeholder'
+import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade } from 'rn-placeholder'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 type ProfileType = {
-  picture: { id: string, base64: null | string }
+  picture: null | string
   name: string
   age: number
   place: string
@@ -24,6 +20,7 @@ type ProfileType = {
 
 export default function RealtimeProfile() {
   const [profile, setProfile] = React.useState<null | ProfileType>(null)
+  const [profilePicture, setProfilePicture] = React.useState<null | string>(null)
 
   React.useEffect(() => {
     const callback = onMessage(newMessage)
@@ -37,7 +34,12 @@ export default function RealtimeProfile() {
         break
 
       default:
+        if(message.grouped_id !== undefined && message.message === '' && message.media !== undefined) {
+          return
+        }
+
         setProfile(null)
+        setProfilePicture(null)
         break
     }
   }
@@ -49,7 +51,7 @@ export default function RealtimeProfile() {
     const picture = message.media['photo']
     loadPhoto(picture)
     return {
-      picture: { id: picture.id, base64: null },
+      picture: null,
       name: matchResults[1],
       age: Number(matchResults[2]),
       place: matchResults[3],
@@ -60,19 +62,13 @@ export default function RealtimeProfile() {
 
   const loadPhoto = async (picture: object) => {
     const pictureBuffer = await getPhoto(picture['id'], picture['access_hash'], picture['file_reference'])
-    setProfile({ 
-      ...profile as ProfileType, 
-      picture: { 
-        id: picture['id'] as string,
-        base64: 'data:image/jpeg;base64,' + pictureBuffer.toString('base64')
-      }
-    })
+    setProfilePicture('data:image/jpeg;base64,' + pictureBuffer.toString('base64'))
   }
 
   return (
     <View>
       {profile !== null
-        ? <Profile data={profile} />
+        ? <Profile data={{ ...profile, picture: profilePicture }} />
         : <Pending />
       }
     </View>
@@ -80,14 +76,40 @@ export default function RealtimeProfile() {
 }
 
 function Profile(props: { data: ProfileType }) {
-  const pfpURI = null//props.data.picture.base64
-
   return (
     <View>
+      <MiniProfile data={props.data} />
+      <InteractionsHistory data={props.data} />
+    </View>
+  )
+}
+
+function MiniProfile(props: { data: ProfileType }) {
+  const pfpURI = props.data.picture
+
+  return (
+    <View style={styles.miniProfile}>
       {pfpURI
-        ? <Image style={styles.pfp} source={{ uri: pfpURI, width: 50, height: 50 }} />
+        ? <Image style={styles.pfp} source={{ uri: pfpURI, width: 100, height: 100 }} />
         : <Placeholders />
       }
+      <View style={styles.info}>
+        <Text variant='titleLarge' style={styles.bold}>{props.data.name}</Text>
+        <Text variant='bodyLarge' style={styles.bold}><Icon name='map-marker' size={15} /> {props.data.place}</Text>
+        <Text variant='bodyLarge' style={styles.infoAge}>{props.data.age} лет</Text>
+        <Text variant='bodyMedium' style={styles.infoText} numberOfLines={1}>{props.data.text}</Text>
+      </View>
+    </View>
+  )
+}
+
+function InteractionsHistory(props: { data: ProfileType }) {
+  return (
+    <View style={styles.interactions}>
+      <Text variant='titleMedium'>История взаимодействий</Text>
+      <ScrollView>
+        <Text variant='titleMedium'>История взаимодействий</Text>
+      </ScrollView>
     </View>
   )
 }
@@ -96,15 +118,9 @@ function Placeholders() {
   return (
     <Placeholder
       Animation={Fade}
+      style={styles.pfpPlaceholder}
     >
-      <View style={styles.miniProfile}>
-        <PlaceholderMedia size={100} style={{ borderRadius: 15 }} />
-        <View style={styles.miniProfile.info}>
-          <PlaceholderLine width={80} />
-          <PlaceholderLine />
-          <PlaceholderLine width={30} />
-        </View>
-      </View>
+      <PlaceholderMedia size={100} style={{ borderRadius: 15 }} />
     </Placeholder>
   )
 }
