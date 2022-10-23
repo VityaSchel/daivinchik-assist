@@ -103,6 +103,7 @@ export default function LoadHistory(props: { onDone: () => any }) {
 
   const finishedPostProcessing = async () => {
     await AsyncStorage.setItem('init_history_export_state', 'finished')
+    console.log(realm.objects('Message'))
     setState(null)
     setLoading(true)
     props.onDone()

@@ -17,7 +17,7 @@ export default function FeedScreen() {
   const [state, setState] = React.useState<'setup' | 'ready' | null>(null)
   const realm = MessageRealmContext.useRealm()
 
-  console.log(realm.objects('Message'))
+  console.log(realm.objects('Message').filtered('info["response"] = "dislike"'))
 
   React.useEffect(() => {
     if(navigation.getState().routes.length > 1)

@@ -43,13 +43,21 @@ export interface MessageFields {
   text: string
   messageID: number
   out: boolean
+  info: MessageInfo
 }
+
+export type MessageInfoCandidateProfile = {
+  response: 'like' | 'dislike'
+}
+/** MessageInfo is a container with additional data added during indexing/postprocessing */
+export type MessageInfo = MessageInfoCandidateProfile/* | any other message type info*/ | { [key: string]: any }
 
 export class Message extends Realm.Object {
   _id!: Realm.BSON.ObjectId
   type!: BotMessageType
   text!: string
   messageID!: number
+  info: MessageInfo
 
   static generate(message: MTProtoMessage): MessageFields {
     return {
@@ -57,7 +65,8 @@ export class Message extends Realm.Object {
       type: message.out ? 'unknown' : detectMessageType(message),
       text: message.message,
       messageID: message.id,
-      out: message.out
+      out: message.out,
+      info: {}
     }
   }
 
@@ -69,7 +78,8 @@ export class Message extends Realm.Object {
       type: 'string',
       text: 'string',
       messageID: 'int',
-      out: 'bool'
+      out: 'bool',
+      info: 'string{}'
     },
   }
 }

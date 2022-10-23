@@ -125,12 +125,10 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
 export function postProcessMessages(finishedCallback: () => any, errorCallback: (reason: string) => any) {
   const realm: Realm = global.realm
 
-  try {
-    console.log('post processing', realm.objects('Message').length, 'messages')
-    const entries = realm.objects('Message').entries()
-
-    for(const iterator of entries) {
-      const i = iterator[0]
+  const entries = realm.objects('Message').entries()
+  
+  for(const iterator of entries) {
+    try {
       const dbEntry = iterator[1] as unknown as MessageFields
       const currentMessage: MessageFields = dbEntry
 
@@ -144,16 +142,28 @@ export function postProcessMessages(finishedCallback: () => any, errorCallback: 
       }
 
       if(currentMessage.type === 'candidate_profile') {
-        const nextMessage = getNMessage(+1)
-        if(nextMessage && nextMessage.text === 'Так выглядит твоя анкета:') {
+        const previousMessage = getNMessage(-1)
+        if(previousMessage && previousMessage.text === 'Так выглядит твоя анкета:') {
           realm.write(() => { currentMessage.type = 'self_profile' })
+        } else {
+          const nextMessage = getNMessage(+1)
+          switch(nextMessage?.text) {
+            case '❤️':
+              realm.write(() => { currentMessage.info['response'] = 'like' })
+              break
+            case '👎':
+              realm.write(() => { currentMessage.info['response'] = 'dislike' })
+              break
+            default:
+              break
+          }
         }
       }
+    } catch(e) {
+      console.error(e)
+      errorCallback(e?.message ?? JSON.stringify(e))
     }
-    
-    finishedCallback()
-  } catch(e) {
-    console.error(e)
-    errorCallback(e?.message ?? JSON.stringify(e))
   }
+  
+  finishedCallback()
 }
