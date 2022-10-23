@@ -9,10 +9,11 @@ import styles from './styles'
 import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade } from 'rn-placeholder'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { MessageRealmContext } from '../../../models'
-import { format } from 'date-fns'
-import { default as dateFnsRu } from 'date-fns/locale/ru'
+import InteractionsHistory from './InteractionsHistory'
+import Instagram from './Instagram'
+import { getLatestMessage } from '../../../../mtproto'
 
-type ProfileType = {
+export type ProfileType = {
   picture: null | string
   name: string
   age: number
@@ -28,6 +29,7 @@ export default function RealtimeProfile() {
   const realm = MessageRealmContext.useRealm()
 
   React.useEffect(() => {
+    getLatestMessage().then(latestMsg => latestMsg !== undefined && newMessage(latestMsg))
     const callback = onMessage(newMessage)
     return () => { global.api.updates.off('updates', callback) }
   }, [])
@@ -93,6 +95,7 @@ function Profile(props: { data: ProfileType }) {
     <View>
       <MiniProfile data={props.data} />
       <InteractionsHistory data={props.data} />
+      <Instagram data={props.data} />
     </View>
   )
 }
@@ -112,31 +115,6 @@ function MiniProfile(props: { data: ProfileType }) {
         <Text variant='bodyLarge' style={styles.infoAge}>{props.data.age} лет</Text>
         <Text variant='bodyMedium' style={styles.infoText} numberOfLines={1}>{props.data.text}</Text>
       </View>
-    </View>
-  )
-}
-
-function InteractionsHistory(props: { data: ProfileType }) {
-  const realm = MessageRealmContext.useRealm()
-  const history = realm.objects('Message')
-    .filtered('text = $0', props.data.fullText)
-    .sorted([['messageID', true]]) as unknown as MessageFields[]
-  console.log(history)
-
-  return (
-    <View style={styles.interactions}>
-      <Text variant='titleMedium'>История взаимодействий:</Text>
-      <ScrollView style={styles.history}>
-        {history.length === 0
-          ? <Text variant='bodyMedium'>Вы еще не встречали эту анкету</Text>
-          : history.map(entry => (
-            <View style={styles.historyEntry} key={entry._id.toHexString()}>
-              <Text><Icon name='calendar-account'/> {format(entry.date * 1000, 'dd MMMM yyyy, HH:mm', { locale: dateFnsRu })}</Text>
-              <Text>Вы {{'liked': '❤️ лайкнули', 'disliked': '👎 дизлайкнули'}[entry.info.response]??'💤 пропустили'} анкету</Text>
-            </View>
-          ))
-        }
-      </ScrollView>
     </View>
   )
 }

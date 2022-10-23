@@ -1,6 +1,8 @@
 import { usingElectron } from '../src/electron-wrapper'
 import { authorizeWithLoginCode, authorizeWith2FA } from './auth'
 import { sendCode } from './utils'
+import { findLeomatchPeer } from './utils'
+import type { Message as MTProtoMessage } from '../src/ts/MessageSchema'
 
 const log = {
   info: console.log
@@ -59,4 +61,18 @@ export async function enterTwoFACode(code: string): Promise<{ success: boolean; 
 async function start(user: object) {
   state = 'authorized'
   console.log(`Пользователь ${user['user']['first_name']} авторизирован, бот начинает работу`)
+}
+
+export async function getLatestMessage(): Promise<MTProtoMessage | undefined> {
+  const result = await findLeomatchPeer()
+  if(result.error !== null) return undefined
+  const history = await global.api.call('messages.getHistory', { 
+    peer: {
+      _: 'inputPeerUser',
+      user_id: result.peer.id,
+      access_hash: result.peer.access_hash
+    },
+    limit: 1
+  })
+  return history.messages[0]
 }

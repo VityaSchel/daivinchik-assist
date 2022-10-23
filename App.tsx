@@ -29,7 +29,6 @@ export default function App() {
 
 function Main() {
   const realm = MessageRealmContext.useRealm()
-  console.log('1', realm)
 
   React.useEffect(() => {
     global.realm = realm

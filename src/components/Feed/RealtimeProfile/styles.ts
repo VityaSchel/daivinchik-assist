@@ -55,5 +55,10 @@ export default StyleSheet.create({
   historyEntry: {
     marginVertical: 10,
     marginLeft: 10
+  },
+  instagramContainer: {
+    borderBottomWidth: 2,
+    borderColor: '#ccc',
+    maxHeight: 100
   }
 })

@@ -2,31 +2,7 @@ import { TextEncoder, TextDecoder } from 'text-encoding'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import _ from 'lodash'
 import { Message, MessageFields } from '../src/models/Message'
-
-type Peer = { id: string, access_hash: string }
-
-export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_peer' | string } | { peer: Peer, error: null }> {
-  if(process.env.NODE_ENV === 'development') return { peer: { access_hash: '5955963651186977509', id: '1234060895' }, error: null }
-  
-  try {
-    const peer = await global.api.call('contacts.resolveUsername', {
-      username: 'leomatchbot'
-    })
-    if(peer._ === 'contacts.resolvedPeer') {
-      const bot = peer.users[0]
-      if(!bot) {
-        return { error: 'unable_to_resolve_peer' }
-      } else {
-
-        return { peer: { access_hash: bot.access_hash, id: bot.id }, error: null }
-      }
-    } else {
-      return { error: 'unable_to_resolve_peer' }
-    }
-  } catch(e) {
-    return { error: JSON.stringify(e) }
-  }
-}
+import type { Peer } from './utils'
 
 const devTest = {
   enabled: true,
