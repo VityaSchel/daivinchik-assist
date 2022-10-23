@@ -1,7 +1,7 @@
 import { Realm } from '@realm/react'
 import type { Message as MTProtoMessage } from '../ts/MessageSchema'
 
-type BotMessageType = 
+export type BotMessageType = 
   /** Reserved for future use */
     'interface'
   /** "Кому-то понравилась твоя анкета(и еще 2)" */
@@ -33,15 +33,16 @@ type BotMessageType =
   /** Any other type that could not be detected. Must be ignored */
   | 'unknown'
 
-const userProfileRegex = '^(.+?), (\\d+), (.+?)( – ([\\s\\S]+?))?(\\n\\nСообщение для тебя💌: ([\\s\\S]+))?$'
-const incomingLikeMessageRegex = '^Кому-то понравилась твоя анкета(:|\\(и еще \\d+\\))?\n\n' + userProfileRegex
-const likeResponseRegex = '^Отлично! Надеюсь хорошо проведете время ;\\) Начинай общаться 👉 (.+)$'
+export const userProfileRegex = '^(.+?), (\\d+), (.+?)( – ([\\s\\S]+?))?(\\n\\nСообщение для тебя💌: ([\\s\\S]+))?$'
+export const incomingLikeMessageRegex = '^Кому-то понравилась твоя анкета(:|\\(и еще \\d+\\))?\n\n' + userProfileRegex
+export const likeResponseRegex = '^Отлично! Надеюсь хорошо проведете время ;\\) Начинай общаться 👉 (.+)$'
 
-interface MessageFields {
+export interface MessageFields {
   _id: Realm.BSON.ObjectId
   type: BotMessageType
   text: string
   messageID: number
+  out: boolean
 }
 
 export class Message extends Realm.Object {
@@ -55,7 +56,8 @@ export class Message extends Realm.Object {
       _id: new Realm.BSON.ObjectId(),
       type: message.out ? 'unknown' : detectMessageType(message),
       text: message.message,
-      messageID: message.id
+      messageID: message.id,
+      out: message.out
     }
   }
 
@@ -66,7 +68,8 @@ export class Message extends Realm.Object {
       _id: 'objectId',
       type: 'string',
       text: 'string',
-      messageID: 'int'
+      messageID: 'int',
+      out: 'bool'
     },
   }
 }

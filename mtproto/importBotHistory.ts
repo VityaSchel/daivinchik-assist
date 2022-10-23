@@ -1,7 +1,7 @@
 import { TextEncoder, TextDecoder } from 'text-encoding'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import _ from 'lodash'
-import { Message } from '../src/models/Message'
+import { Message, MessageFields } from '../src/models/Message'
 
 type Peer = { id: string, access_hash: string }
 
@@ -127,6 +127,21 @@ export function postProcessMessages(finishedCallback: () => any, errorCallback: 
 
   try {
     console.log('post processing', realm.objects('Message').length, 'messages')
+    let previousMessage: null | MessageFields = null
+    const entries = realm.objects('Message').entries() as unknown as MessageFields[]
+    for(const i in entries) {
+      const dbEntry = entries[i]
+      const nextMessage: null | MessageFields = entries[i + 1]
+      const currentMessage = dbEntry[1]
+      if(currentMessage.type === 'candidate_profile') {
+        if(nextMessage && nextMessage.text === 'Так выглядит твоя анкета:') {
+          realm.write(() => { currentMessage.type = 'self_profile' })
+        }
+      }
+
+      previousMessage = currentMessage
+    }
+    console.log(realm.objects('Message'))
   } catch(e) {
     errorCallback(e?.message ?? JSON.stringify(e))
   }
