@@ -9,6 +9,7 @@ import styles from '../styles/Feed'
 import LoadHistory from '../components/Feed/LoadHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MessageRealmContext } from '../models'
+import RealtimeProfile from '../components/Feed/RealtimeProfile'
 
 export default function FeedScreen() {
   const navigation = useNavigation()
@@ -77,7 +78,7 @@ export default function FeedScreen() {
         >Выйти</Button>
       </View>
       {state === 'setup' && <LoadHistory onDone={checkState} />}
-      {state === 'ready' && <Text>Ready!</Text>}
+      {state === 'ready' && <RealtimeProfile />}
       <Button 
         mode='outlined'
         onPress={() => _dev_clearStorage()}
