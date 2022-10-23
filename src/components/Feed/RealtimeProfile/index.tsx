@@ -1,11 +1,17 @@
 import React from 'react'
-import { View } from 'react-native'
+import { Image, View } from 'react-native'
 import { Text } from 'react-native-paper'
 import { onMessage } from '../../../../mtproto/updates'
 import { getPhoto } from '../../../../mtproto/utils'
 import { detectMessageType, userProfileRegex } from '../../../models/Message'
 import { Message } from '../../../ts/MessageSchema'
 import styles from './styles'
+import {
+  Placeholder,
+  PlaceholderMedia,
+  PlaceholderLine,
+  Fade
+} from 'rn-placeholder'
 
 type ProfileType = {
   picture: { id: string, base64: null | string }
@@ -54,11 +60,13 @@ export default function RealtimeProfile() {
 
   const loadPhoto = async (picture: object) => {
     const pictureBuffer = await getPhoto(picture['id'], picture['access_hash'], picture['file_reference'])
-    if(profile?.picture.id === picture['id']) {
-      'data:image/jpeg;base64,' +  pictureBuffer.toString('base64')
-    } else {
-      console.log('outdated', profile)
-    }
+    setProfile({ 
+      ...profile as ProfileType, 
+      picture: { 
+        id: picture['id'] as string,
+        base64: 'data:image/jpeg;base64,' + pictureBuffer.toString('base64')
+      }
+    })
   }
 
   return (
@@ -72,10 +80,32 @@ export default function RealtimeProfile() {
 }
 
 function Profile(props: { data: ProfileType }) {
+  const pfpURI = null//props.data.picture.base64
+
   return (
     <View>
-
+      {pfpURI
+        ? <Image style={styles.pfp} source={{ uri: pfpURI, width: 50, height: 50 }} />
+        : <Placeholders />
+      }
     </View>
+  )
+}
+
+function Placeholders() {
+  return (
+    <Placeholder
+      Animation={Fade}
+    >
+      <View style={styles.miniProfile}>
+        <PlaceholderMedia size={100} style={{ borderRadius: 15 }} />
+        <View style={styles.miniProfile.info}>
+          <PlaceholderLine width={80} />
+          <PlaceholderLine />
+          <PlaceholderLine width={30} />
+        </View>
+      </View>
+    </Placeholder>
   )
 }
 

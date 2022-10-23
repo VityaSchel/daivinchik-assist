@@ -10,5 +10,16 @@ export default StyleSheet.create({
     title: {
       marginBottom: 10
     }
+  },
+  miniProfile: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: 20,
+
+    info: {
+      display: 'flex',
+      flex: 1,
+      marginLeft: 20
+    }
   }
 })
