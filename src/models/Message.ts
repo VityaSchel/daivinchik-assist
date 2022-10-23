@@ -1,4 +1,5 @@
 import { Realm } from '@realm/react'
+import type { Message as MTProtoMessage } from '../ts/MessageSchema'
 
 type BotMessageType = 
   /** Reserved for future use */
@@ -40,18 +41,21 @@ interface MessageFields {
   _id: Realm.BSON.ObjectId
   type: BotMessageType
   text: string
+  messageID: number
 }
 
 export class Message extends Realm.Object {
   _id!: Realm.BSON.ObjectId
   type!: BotMessageType
   text!: string
+  messageID!: number
 
-  static generate(message: object): MessageFields {
+  static generate(message: MTProtoMessage): MessageFields {
     return {
       _id: new Realm.BSON.ObjectId(),
-      type: message['out'] ? 'unknown' : detectMessageType(message),
-      text: message['message']
+      type: message.out ? 'unknown' : detectMessageType(message),
+      text: message.message,
+      messageID: message.id
     }
   }
 
@@ -61,19 +65,38 @@ export class Message extends Realm.Object {
     properties: {
       _id: 'objectId',
       type: 'string',
-      text: 'string'
+      text: 'string',
+      messageID: 'int'
     },
   }
 }
 
-function detectMessageType(message: object): BotMessageType {
+function detectMessageType(message: MTProtoMessage): BotMessageType {
   if(new RegExp(incomingLikeMessageRegex).test(message['message'])) {
     return 'incoming_like'
   } else if(new RegExp(userProfileRegex).test(message['message'])) {
+    // const previousMessage = getPreviousMessage(message)
+    // console.log(message.id, message.message, previousMessage)
+    // if(previousMessage && previousMessage.text === 'Так выглядит твоя анкета:') {
+    //   return 'self_profile'
+    // } else {
+    //   return 'candidate_profile'
+    // }
+    // TODO: write post-processing logic to separate 'candidate_profile' and 'self_profile'
     return 'candidate_profile'
   } else if(new RegExp(likeResponseRegex).test(message['message'])) {
     return 'like_response'
   } else {
     return 'unknown'
   }
+}
+
+function getPreviousMessage(currentMessage: MTProtoMessage): MessageFields | undefined {
+  const realm: Realm = global.realm
+  const previousMessage = realm.objects('Message')
+    .filtered(`messageID < ${currentMessage.id}`)
+    .sorted([['messageID', true]])
+    .slice(0, 1)[0] as unknown as MessageFields | undefined
+
+  return previousMessage
 }

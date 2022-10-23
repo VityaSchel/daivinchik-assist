@@ -28,13 +28,11 @@ export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_pe
   }
 }
 
-// const maxStorageSize = 4000000
-// const maxChunkSize = 1000000
-
-/**
- * Query only latest 10 messages
- */
-const devTest = true
+const devTest = {
+  enabled: true,
+  pageSize: 10,
+  pages: 2
+}
 
 export function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number) {
   let abortSignal = false
@@ -42,7 +40,7 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
 
   return {
     promise: new Promise<void>(async (resolve) => {
-      const pageSize = devTest ? 5 : 100
+      const pageSize = devTest.enabled ? devTest.pageSize : 100
       // const messagesList: object[] = offset_ ? await readAndParseMessagesLocally() : []
       let offsetID = Number.isInteger(offset_) ? offset_ : undefined
       const realm: Realm = global.realm
@@ -67,10 +65,10 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
     
         if(offsetID === undefined || offset_ !== undefined) max = history.count
     
-        if(exportedMessagesCount > 0) {
-          offsetID = history.messages[history.messages.length - 1].id
-        }
-        
+        // if(exportedMessagesCount > 0) {
+          // }
+          
+        offsetID = history.messages[history.messages.length - 1].id
         exportedMessagesCount += messages.length
         console.log('Saved', exportedMessagesCount, 'messages')
         callback(exportedMessagesCount, max, offsetID ?? 0)
@@ -84,8 +82,12 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
         if(messages.length === 0) {
           break
         }
+
+        if(devTest && exportedMessagesCount >= devTest.pageSize * devTest.pages) {
+          break
+        }
     
-      } while((devTest && exportedMessagesCount < 10) || (exportedMessagesCount < max && !abortSignal))
+      } while(exportedMessagesCount < max && !abortSignal)
       resolve()
     }),
     abort: () => { abortSignal = true }

@@ -8,12 +8,16 @@ import { getSelfPhoto, getUser } from '../../mtproto/utils'
 import styles from '../styles/Feed'
 import LoadHistory from '../components/Feed/LoadHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { MessageRealmContext } from '../models'
 
 export default function FeedScreen() {
   const navigation = useNavigation()
   const [user, setUser] = React.useState<object | null>(null)
   const [profilePictureBase64, setProfilePictureBase64] = React.useState<string | null>(null)
   const [state, setState] = React.useState<'setup' | 'ready' | null>(null)
+  const realm = MessageRealmContext.useRealm()
+
+  console.log(realm.objects('Message'))
 
   React.useEffect(() => {
     if(navigation.getState().routes.length > 1)
@@ -47,6 +51,15 @@ export default function FeedScreen() {
       setState('setup')
     }
   }
+
+  const _dev_clearStorage = async () => {
+    await AsyncStorage.removeItem('init_history_export_state')
+    await AsyncStorage.removeItem('init_history_exported_msgs_process')
+    realm.write(() => {
+      realm.delete(realm.objects('Message'))
+    })
+    navigation.reset({ routes: [{ name: 'Feed' }], index: 0 })
+  }
   
   if(!user) return <View></View>
 
@@ -65,6 +78,11 @@ export default function FeedScreen() {
       </View>
       {state === 'setup' && <LoadHistory onDone={checkState} />}
       {state === 'ready' && <Text>Ready!</Text>}
+      <Button 
+        mode='outlined'
+        onPress={() => _dev_clearStorage()}
+        style={{ marginTop: 10 }}
+      >[[ Clear messages storage ]]</Button>
     </Container>
   )
 }
