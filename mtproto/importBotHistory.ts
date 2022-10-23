@@ -129,32 +129,29 @@ export function postProcessMessages(finishedCallback: () => any, errorCallback: 
     console.log('post processing', realm.objects('Message').length, 'messages')
     const entries = realm.objects('Message').entries()
 
-    type Entry = null | MessageFields
-
-    const callPostProcessor = (currentIndex: number, previousEntry: Entry, currentEntry: Entry, nextEntry: Entry) => {
-      console.log(currentIndex, previousEntry, currentEntry, nextEntry)
-
-      // const i = iterator[0]
-      // const dbEntry = iterator[1] as unknown as MessageFields
-      // const previousMessage:  = entries[i - 1]
-      // const currentMessage: MessageFields = dbEntry
-      // const nextMessage: null | MessageFields = entries[i + 1]
-
-      // if(currentMessage.type === 'candidate_profile') {
-      //   console.log(currentMessage.text, nextMessage, nextMessage?.text)
-      //   if(nextMessage && nextMessage.text === 'Так выглядит твоя анкета:') {
-      //     realm.write(() => { currentMessage.type = 'self_profile' })
-      //   }
-      // }
-    }
-
-    let previousIterator
     for(const iterator of entries) {
-      // console.log(iterator)
-      callPostProcessor(previousIterator, iterator)
-      previousIterator = iterator
+      const i = iterator[0]
+      const dbEntry = iterator[1] as unknown as MessageFields
+      const currentMessage: MessageFields = dbEntry
+
+      const getNMessage = (offset: number): MessageFields | undefined => {
+        const message = realm.objects('Message')
+          .filtered(`messageID ${offset > 0 ? '>' : '<'} ${currentMessage.messageID}`)
+          .sorted([['messageID', offset < 0]])
+          .slice(0, 1)[0] as unknown as MessageFields | undefined
+
+        return message
+      }
+
+      if(currentMessage.type === 'candidate_profile') {
+        const nextMessage = getNMessage(+1)
+        if(nextMessage && nextMessage.text === 'Так выглядит твоя анкета:') {
+          realm.write(() => { currentMessage.type = 'self_profile' })
+        }
+      }
     }
-    console.log(realm.objects('Message'))
+    
+    finishedCallback()
   } catch(e) {
     console.error(e)
     errorCallback(e?.message ?? JSON.stringify(e))
