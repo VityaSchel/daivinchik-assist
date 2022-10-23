@@ -84,7 +84,7 @@ export class Message extends Realm.Object {
   }
 }
 
-function detectMessageType(message: MTProtoMessage): BotMessageType {
+export function detectMessageType(message: MTProtoMessage): BotMessageType {
   if(new RegExp(incomingLikeMessageRegex).test(message['message'])) {
     return 'incoming_like'
   } else if(new RegExp(userProfileRegex).test(message['message'])) {

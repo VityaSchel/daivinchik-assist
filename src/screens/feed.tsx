@@ -39,7 +39,6 @@ export default function FeedScreen() {
     const photoID = user['photo']['photo_id']
     if(photoID) {
       const profilePhotoBuffer = await getSelfPhoto(photoID)
-      console.log(profilePhotoBuffer.length)
       setProfilePictureBase64('data:image/jpeg;base64,' + profilePhotoBuffer.toString('base64'))
     }
   }

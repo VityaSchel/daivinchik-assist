@@ -67,20 +67,33 @@ export function checkPassword({ srp_id, A, M1 }: { srp_id: any, A: any, M1: any 
 }
 
 export async function getSelfPhoto(photoID: string): Promise<Buffer> {
-  let i = 0
+  return downloadFile({
+    _: 'inputPeerPhotoFileLocation',
+    big: false,
+    peer: {
+      _: 'inputPeerSelf',
+    },
+    photo_id: photoID
+  })
+}
+
+export async function getPhoto(photoID: string, accessHash: string, fileReference: number[], version = 'm'): Promise<Buffer> {
+  return downloadFile({
+    _: 'inputPhotoFileLocation',
+    id: photoID,
+    access_hash: accessHash,
+    file_reference: fileReference,
+    thumb_size: version
+  })
+}
+
+export async function downloadFile(location: object): Promise<Buffer> {
   const partSize = 524288
 
   const downloadPart = async (i: number): Promise<number[]> => {
     const part = await global.api.call('upload.getFile', {
       cdn_supported: false,
-      location: {
-        _: 'inputPeerPhotoFileLocation',
-        big: false,
-        peer: {
-          _: 'inputPeerSelf',
-        },
-        photo_id: photoID
-      },
+      location: location,
       offset: i*partSize,
       limit: partSize
     })
