@@ -34,14 +34,13 @@ const devTest = {
   pages: 2
 }
 
-export function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number) {
+export function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number, finishedCallback: () => any) {
   let abortSignal = false
   let max: number
 
   return {
     promise: new Promise<void>(async (resolve) => {
       const pageSize = devTest.enabled ? devTest.pageSize : 100
-      // const messagesList: object[] = offset_ ? await readAndParseMessagesLocally() : []
       let offsetID = Number.isInteger(offset_) ? offset_ : undefined
       const realm: Realm = global.realm
       console.log('Message count', realm.objects('Message').length)
@@ -49,6 +48,7 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
 
       do {
         console.log('Calling export history with offset', offsetID, 'and limit', pageSize, 'Exported:', exportedMessagesCount)
+        
         const history = await global.api.call('messages.getHistory', {
           peer: {
             _: 'inputPeerUser',
@@ -60,19 +60,14 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
         })
         if(abortSignal) break
 
-        const messages = history.messages//filterNecessaryData(history.messages)
-        
-    
+        const messages = history.messages
+
         if(offsetID === undefined || offset_ !== undefined) max = history.count
-    
-        // if(exportedMessagesCount > 0) {
-          // }
           
         offsetID = history.messages[history.messages.length - 1].id
         exportedMessagesCount += messages.length
         console.log('Saved', exportedMessagesCount, 'messages')
         callback(exportedMessagesCount, max, offsetID ?? 0)
-        // await addMessages(messages)
         realm.write(() => {
           for(const message of messages) {
             realm.create('Message', Message.generate(message))
@@ -88,6 +83,7 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
         }
     
       } while(exportedMessagesCount < max && !abortSignal)
+      if(exportedMessagesCount >= max) finishedCallback()
       resolve()
     }),
     abort: () => { abortSignal = true }
@@ -125,13 +121,13 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
 //   return tmpKeys
 // }
 
-// function filterNecessaryData(messages: object[]) {
-//   return messages
-//     .filter(msg => msg._ === 'message')
-//     .map(msg => ({
-//       o: msg['out'] ? 1 : 0,
-//       t: msg['message'],
-//       d: msg['date'],
-//       ...(msg['media'] && { m: 1 })
-//     }))
-// }
+
+export function postProcessMessages(finishedCallback: () => any, errorCallback: (reason: string) => any) {
+  const realm: Realm = global.realm
+
+  try {
+    console.log('post processing', realm.objects('Message').length, 'messages')
+  } catch(e) {
+    errorCallback(e?.message ?? JSON.stringify(e))
+  }
+}
