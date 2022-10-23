@@ -24,12 +24,14 @@ export default function Instagram(props: { data: ProfileType }) {
     <View style={styles.instagram}>
       <View style={styles.instagramTitle}>
         <Text variant='titleMedium'>Instagram профиль:</Text>
-        <View style={styles.instagramActions}>
-          <IconButton icon='open-in-new' size={20} onPress={openInBrowser} />
-          <IconButton icon='reload' size={20} onPress={refresh} />
-        </View>
+        {instagramUsernameHandle && (
+          <View style={styles.instagramActions}>
+            <IconButton icon='open-in-new' size={20} onPress={openInBrowser} />
+            <IconButton icon='reload' size={20} onPress={refresh} />
+          </View>
+        )}
       </View>
-      <View style={styles.instagramContainer}>
+      <View>
         {instagramUsernameHandle
           ? (
             <>
