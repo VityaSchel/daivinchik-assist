@@ -127,22 +127,36 @@ export function postProcessMessages(finishedCallback: () => any, errorCallback: 
 
   try {
     console.log('post processing', realm.objects('Message').length, 'messages')
-    let previousMessage: null | MessageFields = null
-    const entries = realm.objects('Message').entries() as unknown as MessageFields[]
-    for(const i in entries) {
-      const dbEntry = entries[i]
-      const nextMessage: null | MessageFields = entries[i + 1]
-      const currentMessage = dbEntry[1]
-      if(currentMessage.type === 'candidate_profile') {
-        if(nextMessage && nextMessage.text === 'Так выглядит твоя анкета:') {
-          realm.write(() => { currentMessage.type = 'self_profile' })
-        }
-      }
+    const entries = realm.objects('Message').entries()
 
-      previousMessage = currentMessage
+    type Entry = null | MessageFields
+
+    const callPostProcessor = (currentIndex: number, previousEntry: Entry, currentEntry: Entry, nextEntry: Entry) => {
+      console.log(currentIndex, previousEntry, currentEntry, nextEntry)
+
+      // const i = iterator[0]
+      // const dbEntry = iterator[1] as unknown as MessageFields
+      // const previousMessage:  = entries[i - 1]
+      // const currentMessage: MessageFields = dbEntry
+      // const nextMessage: null | MessageFields = entries[i + 1]
+
+      // if(currentMessage.type === 'candidate_profile') {
+      //   console.log(currentMessage.text, nextMessage, nextMessage?.text)
+      //   if(nextMessage && nextMessage.text === 'Так выглядит твоя анкета:') {
+      //     realm.write(() => { currentMessage.type = 'self_profile' })
+      //   }
+      // }
+    }
+
+    let previousIterator
+    for(const iterator of entries) {
+      // console.log(iterator)
+      callPostProcessor(previousIterator, iterator)
+      previousIterator = iterator
     }
     console.log(realm.objects('Message'))
   } catch(e) {
+    console.error(e)
     errorCallback(e?.message ?? JSON.stringify(e))
   }
 }
