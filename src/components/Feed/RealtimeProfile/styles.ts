@@ -46,5 +46,14 @@ export default StyleSheet.create({
   },
   interactions: {
     marginTop: 30
+  },
+  history: {
+    borderBottomWidth: 2,
+    borderColor: '#ccc',
+    maxHeight: 100
+  },
+  historyEntry: {
+    marginVertical: 10,
+    marginLeft: 10
   }
 })

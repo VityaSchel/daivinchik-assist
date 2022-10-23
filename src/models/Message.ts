@@ -44,6 +44,7 @@ export interface MessageFields {
   messageID: number
   out: boolean
   info: MessageInfo
+  date: number
 }
 
 export type MessageInfoCandidateProfile = {
@@ -57,7 +58,9 @@ export class Message extends Realm.Object {
   type!: BotMessageType
   text!: string
   messageID!: number
-  info: MessageInfo
+  out!: boolean
+  info!: MessageInfo
+  date!: number
 
   static generate(message: MTProtoMessage): MessageFields {
     return {
@@ -66,7 +69,8 @@ export class Message extends Realm.Object {
       text: message.message,
       messageID: message.id,
       out: message.out,
-      info: {}
+      info: {},
+      date: message.date
     }
   }
 
@@ -79,7 +83,8 @@ export class Message extends Realm.Object {
       text: 'string',
       messageID: 'int',
       out: 'bool',
-      info: 'string{}'
+      info: 'string{}',
+      date: 'int'
     },
   }
 }
@@ -88,14 +93,6 @@ export function detectMessageType(message: MTProtoMessage): BotMessageType {
   if(new RegExp(incomingLikeMessageRegex).test(message['message'])) {
     return 'incoming_like'
   } else if(new RegExp(userProfileRegex).test(message['message'])) {
-    // const previousMessage = getPreviousMessage(message)
-    // console.log(message.id, message.message, previousMessage)
-    // if(previousMessage && previousMessage.text === 'Так выглядит твоя анкета:') {
-    //   return 'self_profile'
-    // } else {
-    //   return 'candidate_profile'
-    // }
-    // TODO: write post-processing logic to separate 'candidate_profile' and 'self_profile'
     return 'candidate_profile'
   } else if(new RegExp(likeResponseRegex).test(message['message'])) {
     return 'like_response'

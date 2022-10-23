@@ -1,19 +1,23 @@
 import React from 'react'
 import { Image, ScrollView, View } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Button, Text } from 'react-native-paper'
 import { onMessage } from '../../../../mtproto/updates'
 import { getPhoto } from '../../../../mtproto/utils'
-import { detectMessageType, userProfileRegex } from '../../../models/Message'
-import { Message } from '../../../ts/MessageSchema'
+import { detectMessageType, Message, MessageFields, userProfileRegex } from '../../../models/Message'
+import { Message as MTProtoMessage } from '../../../ts/MessageSchema'
 import styles from './styles'
 import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade } from 'rn-placeholder'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { MessageRealmContext } from '../../../models'
+import { format } from 'date-fns'
+import { default as dateFnsRu } from 'date-fns/locale/ru'
 
 type ProfileType = {
   picture: null | string
   name: string
   age: number
   place: string
+  fullText: string
   text?: string
   personalMessage?: string
 }
@@ -21,13 +25,15 @@ type ProfileType = {
 export default function RealtimeProfile() {
   const [profile, setProfile] = React.useState<null | ProfileType>(null)
   const [profilePicture, setProfilePicture] = React.useState<null | string>(null)
+  const realm = MessageRealmContext.useRealm()
 
   React.useEffect(() => {
     const callback = onMessage(newMessage)
     return () => { global.api.updates.off('updates', callback) }
   }, [])
 
-  const newMessage = (message: Message) => {
+  const newMessage = (message: MTProtoMessage) => {
+    console.log(message)
     switch(detectMessageType(message)) {
       case 'candidate_profile':
         setProfile(parseProfile(message))
@@ -44,7 +50,7 @@ export default function RealtimeProfile() {
     }
   }
 
-  const parseProfile = (message: Message): ProfileType | null => {
+  const parseProfile = (message: MTProtoMessage): ProfileType | null => {
     const matchResults = message.message.match(new RegExp(userProfileRegex))
     if(!matchResults) return null
     
@@ -55,6 +61,7 @@ export default function RealtimeProfile() {
       name: matchResults[1],
       age: Number(matchResults[2]),
       place: matchResults[3],
+      fullText: message.message,
       text: matchResults[5],
       personalMessage: matchResults[7]
     }
@@ -71,6 +78,12 @@ export default function RealtimeProfile() {
         ? <Profile data={{ ...profile, picture: profilePicture }} />
         : <Pending />
       }
+      {/* {process.env.NODE_ENV === 'development' && (
+        <Button 
+          mode='outlined'
+          onPress={() => { realm.write(() => realm.objects('Message', Message.generate({"_": "message", "date": 1666543945, "edit_hide": false, "flags": 131584, "from_scheduled": false, "grouped_id": "13332351565913690", "id": 11385, "legacy": false, "media": {"_": "messageMediaPhoto", "flags": 1, "photo": {"_": "photo", "access_hash": "2022908885812767181", "date": 1666200790, "dc_id": 2, "file_reference": [], "flags": 0, "has_stickers": false, "id": "5368747569003481200", "sizes": [Array]}}, "media_unread": false, "mentioned": false, "message": "вова, 15, Самара – Омг", "noforwards": false, "out": false, "peer_id": {"_": "peerUser", "user_id": "1234060895"}, "pinned": false, "post": false, "silent": false}))) }}
+        >[[ Add to DB ]]</Button>
+      )} */}
     </View>
   )
 }
@@ -104,11 +117,25 @@ function MiniProfile(props: { data: ProfileType }) {
 }
 
 function InteractionsHistory(props: { data: ProfileType }) {
+  const realm = MessageRealmContext.useRealm()
+  const history = realm.objects('Message')
+    .filtered('text = $0', props.data.fullText)
+    .sorted([['messageID', true]]) as unknown as MessageFields[]
+  console.log(history)
+
   return (
     <View style={styles.interactions}>
-      <Text variant='titleMedium'>История взаимодействий</Text>
-      <ScrollView>
-        <Text variant='titleMedium'>История взаимодействий</Text>
+      <Text variant='titleMedium'>История взаимодействий:</Text>
+      <ScrollView style={styles.history}>
+        {history.length === 0
+          ? <Text variant='bodyMedium'>Вы еще не встречали эту анкету</Text>
+          : history.map(entry => (
+            <View style={styles.historyEntry} key={entry._id.toHexString()}>
+              <Text><Icon name='calendar-account'/> {format(entry.date * 1000, 'dd MMMM yyyy, HH:mm', { locale: dateFnsRu })}</Text>
+              <Text>Вы {{'liked': '❤️ лайкнули', 'disliked': '👎 дизлайкнули'}[entry.info.response]??'💤 пропустили'} анкету</Text>
+            </View>
+          ))
+        }
       </ScrollView>
     </View>
   )

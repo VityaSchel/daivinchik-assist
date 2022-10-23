@@ -18,8 +18,6 @@ export default function FeedScreen() {
   const [state, setState] = React.useState<'setup' | 'ready' | null>(null)
   const realm = MessageRealmContext.useRealm()
 
-  console.log(realm.objects('Message').filtered('info["response"] = "dislike"'))
-
   React.useEffect(() => {
     if(navigation.getState().routes.length > 1)
       resetNavigation(navigation, 'Feed')
@@ -78,11 +76,12 @@ export default function FeedScreen() {
       </View>
       {state === 'setup' && <LoadHistory onDone={checkState} />}
       {state === 'ready' && <RealtimeProfile />}
-      <Button 
+      {process.env.NODE_ENV === 'development' && <Button 
         mode='outlined'
         onPress={() => _dev_clearStorage()}
         style={{ marginTop: 400 }}
-      >[[ Clear messages storage ]]</Button>
+      >[[ Clear messages storage ]]</Button>}
+      
     </Container>
   )
 }
