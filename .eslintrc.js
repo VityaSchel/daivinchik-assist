@@ -40,6 +40,7 @@ module.exports = {
       'never'
     ],
     'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off'
+    'react/react-in-jsx-scope': 'off',
+    'no-async-promise-executor': 'off'
   }
 }

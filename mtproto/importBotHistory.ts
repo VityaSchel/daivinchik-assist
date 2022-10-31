@@ -1,6 +1,3 @@
-import { TextEncoder, TextDecoder } from 'text-encoding'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import _ from 'lodash'
 import { Message, MessageFields } from '../src/models/Message'
 import type { Peer } from './utils'
 
@@ -66,38 +63,6 @@ export function exportHistory(leomatchPeer: Peer, callback?: (exported: number, 
     abort: () => { abortSignal = true }
   }
 }
-
-// const const_name = 'init_history_exported_msgs_tmp_'
-// async function saveMessagesLocally(messages: object[]) {
-//   const messagesSerialized = JSON.stringify(messages)
-//   const maxChars = maxChunkSize / 2 // each char is 1-4 bytes, 2 is average
-//   const messagesSerializedChunksSplitted = _.chunk(messagesSerialized, maxChars)
-//   const messagesSerializedChunks = messagesSerializedChunksSplitted.map(splittedPart => splittedPart.join(''))
-//   const keyValuePairs: [string, string][] = messagesSerializedChunks.map((value, i) => [const_name + i, value])
-//   console.log('Saved', keyValuePairs.length, 'pairs to storage')
-
-//   const keys = await getStorageKeys()
-//   keys.length && await AsyncStorage.multiRemove(keys)
-//   await AsyncStorage.multiSet(keyValuePairs)
-// }
-
-// async function readAndParseMessagesLocally() {
-//   const keys = await getStorageKeys()
-//   if(!keys.length) return []
-//   const keyValuePairs = await AsyncStorage.multiGet(keys)
-//   const messagesSerializedChunks = keyValuePairs.map(([, value]) => value)
-//   const messagesSerialized = messagesSerializedChunks.join('')
-//   const messages = JSON.parse(messagesSerialized)
-//   console.log('Successfully retrived', messages.length, 'from storage and resumed downloading')
-//   return messages
-// }
-
-// async function getStorageKeys() {
-//   const allKeys = await AsyncStorage.getAllKeys()
-//   const tmpKeys = allKeys.filter(key => key.startsWith(const_name))
-//   return tmpKeys
-// }
-
 
 export function postProcessMessages(finishedCallback: () => any, errorCallback: (reason: string) => any) {
   const realm: Realm = global.realm

@@ -19,7 +19,6 @@ export default function FeedScreen() {
   const [user, setUser] = React.useState<object | null>(null)
   const [profilePictureBase64, setProfilePictureBase64] = React.useState<string | null>(null)
   const [state, setState] = React.useState<'setup' | 'update' | 'ready' | null>(null)
-  const stateRef = React.useRef<typeof setState>()
   const realm = MessageRealmContext.useRealm()
 
   React.useEffect(() => {
@@ -31,8 +30,6 @@ export default function FeedScreen() {
     fetchUser()
     checkState()
   }, [])
-
-  React.useEffect(() => { stateRef.current = setState }, [setState])
 
   const fetchUser = async () => {
     const users = await getUser()
@@ -67,10 +64,6 @@ export default function FeedScreen() {
         if(result.error !== null) {
           ToastAndroid.show(`Ошибка во время обработки: ${result.error}`, 1)
         } else {
-          // const finishedDownloading = () => {
-          //   console.log('finished', stateRef.current)
-          //   stateRef.current?.('ready')    
-          // }
           await exportHistory(result.peer, undefined, { type: 'downloadNewer', value: savedLatestMessage.messageID }).promise
           setState('ready')
         }
