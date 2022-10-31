@@ -1,6 +1,6 @@
 # Дайвинчик Ассист
 
-[README in English](#)
+[README in English](./README_en.md)
 
 \[Todo: banner\]
 
