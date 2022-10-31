@@ -36,7 +36,7 @@ export default function LoginPhoneScreen() {
     setLoading(false)
     if(result.error) {
       if(result.error === '2fa_password_needed') {
-        console.log('go to 2fa')
+        setError('Пожалуйста, отключите 2FA')
       } else {
         setError({
           'account_not_found': 'Аккаунт не найден',

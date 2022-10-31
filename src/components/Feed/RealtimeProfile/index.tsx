@@ -35,7 +35,6 @@ export default function RealtimeProfile() {
   }, [])
 
   const newMessage = (message: MTProtoMessage) => {
-    console.log(message)
     switch(detectMessageType(message)) {
       case 'candidate_profile':
         setProfile(parseProfile(message))

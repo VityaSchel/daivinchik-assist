@@ -1,21 +1,25 @@
 import React from 'react'
-import { View, Image } from 'react-native'
+import { View, Image, ToastAndroid } from 'react-native'
 import { Text, Button } from 'react-native-paper'
 import Container from '../Container'
 import { useNavigation } from '@react-navigation/native'
 import { resetNavigation } from '../../utils'
-import { getSelfPhoto, getUser } from '../../mtproto/utils'
+import { findLeomatchPeer, getSelfPhoto, getUser } from '../../mtproto/utils'
 import styles from '../styles/Feed'
 import LoadHistory from '../components/Feed/LoadHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MessageRealmContext } from '../models'
 import RealtimeProfile from '../components/Feed/RealtimeProfile'
+import { getLatestMessage } from '../../mtproto'
+import { Message } from '../models/Message'
+import { exportHistory } from '../../mtproto/importBotHistory'
 
 export default function FeedScreen() {
   const navigation = useNavigation()
   const [user, setUser] = React.useState<object | null>(null)
   const [profilePictureBase64, setProfilePictureBase64] = React.useState<string | null>(null)
-  const [state, setState] = React.useState<'setup' | 'ready' | null>(null)
+  const [state, setState] = React.useState<'setup' | 'update' | 'ready' | null>(null)
+  const stateRef = React.useRef<typeof setState>()
   const realm = MessageRealmContext.useRealm()
 
   React.useEffect(() => {
@@ -27,6 +31,8 @@ export default function FeedScreen() {
     fetchUser()
     checkState()
   }, [])
+
+  React.useEffect(() => { stateRef.current = setState }, [setState])
 
   const fetchUser = async () => {
     const users = await getUser()
@@ -44,7 +50,33 @@ export default function FeedScreen() {
   const checkState = async () => {
     const setupState = await AsyncStorage.getItem('init_history_export_state')
     if(setupState === 'finished') {
-      setState('ready')
+      const savedLatestMessage: Message | undefined = realm.objects('Message').sorted([['messageID', true]]).slice(0, 1)[0] as Message | undefined
+      if(!savedLatestMessage) {
+        setState('setup')
+        return
+      }
+      const actualLatestMessage = await getLatestMessage()
+      if(!actualLatestMessage) {
+        setState('ready')
+        return
+      }
+      if(savedLatestMessage.messageID < actualLatestMessage.id) {
+        console.log('Missed', actualLatestMessage.id - savedLatestMessage.messageID, 'messages. Actualizing...')
+        setState('update')
+        const result = await findLeomatchPeer()
+        if(result.error !== null) {
+          ToastAndroid.show(`Ошибка во время обработки: ${result.error}`, 1)
+        } else {
+          // const finishedDownloading = () => {
+          //   console.log('finished', stateRef.current)
+          //   stateRef.current?.('ready')    
+          // }
+          await exportHistory(result.peer, undefined, { type: 'downloadNewer', value: savedLatestMessage.messageID }).promise
+          setState('ready')
+        }
+      } else {
+        setState('ready')
+      }
     } else {
       setState('setup')
     }
@@ -75,6 +107,12 @@ export default function FeedScreen() {
         >Выйти</Button>
       </View>
       {state === 'setup' && <LoadHistory onDone={checkState} />}
+      {state === 'update' && (<View style={styles.updating}>
+        <Text variant='bodyLarge'>История подгружается...</Text>
+        <Text variant='bodyMedium' style={styles.text}>
+          Загрузка и анализ новых сообщений, которые появились с момента выхода из Дайвинчик Ассист. Пожалуйста, подождите.
+        </Text>
+      </View>)}
       {state === 'ready' && <RealtimeProfile />}
       {process.env.NODE_ENV === 'development' && <Button 
         mode='outlined'

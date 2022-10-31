@@ -113,6 +113,7 @@ export type Peer = { id: string, access_hash: string }
 
 export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_peer' | string } | { peer: Peer, error: null }> {
   if(process.env.NODE_ENV === 'development') return { peer: { access_hash: '5955963651186977509', id: '1234060895' }, error: null }
+  if(global.leomatchPeer) return { peer: global.leomatchPeer, error: null }
   
   try {
     const peer = await global.api.call('contacts.resolveUsername', {
@@ -123,8 +124,9 @@ export async function findLeomatchPeer(): Promise<{ error: 'unable_to_resolve_pe
       if(!bot) {
         return { error: 'unable_to_resolve_peer' }
       } else {
-
-        return { peer: { access_hash: bot.access_hash, id: bot.id }, error: null }
+        const peer = { access_hash: bot.access_hash, id: bot.id }
+        global.leomatchPeer = peer
+        return { peer, error: null }
       }
     } else {
       return { error: 'unable_to_resolve_peer' }

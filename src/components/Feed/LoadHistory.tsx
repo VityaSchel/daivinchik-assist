@@ -21,7 +21,7 @@ export default function LoadHistory(props: { onDone: () => any }) {
     setError(null)
 
     const result = await findLeomatchPeer()
-    if(result.error) {
+    if(result.error !== null) {
       setLoading(false)
       setError({
         'unable_to_resolve_peer': 'Не удалось получить peer бота Дайвинчик. Возможно, он был удален из Telegram или вы используете устаревшую версию приложения.'
@@ -33,7 +33,7 @@ export default function LoadHistory(props: { onDone: () => any }) {
         setProgress(exported / max)
         AsyncStorage.setItem('init_history_exported_msgs_process', JSON.stringify({ exported, max, offset }))
       }
-      const { abort } = exportHistory(result.peer, callback, continueFrom?.offset, finishedDownloading)
+      const { abort } = exportHistory(result.peer, callback, continueFrom?.offset ? { type: 'downloadOlder', value: continueFrom.offset } : undefined, finishedDownloading)
       
       // Dirty trick that pollutes global space.
       // TODO: Replace and avoid
@@ -104,7 +104,6 @@ export default function LoadHistory(props: { onDone: () => any }) {
 
   const finishedPostProcessing = async () => {
     await AsyncStorage.setItem('init_history_export_state', 'finished')
-    console.log(realm.objects('Message'))
     setState(null)
     setLoading(true)
     props.onDone()

@@ -15,5 +15,16 @@ export default StyleSheet.create({
   },
   logout: {
     marginLeft: 'auto'
+  },
+  updating: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    marginTop: 50
+  },
+  text: {
+    textAlign: 'center',
+    marginTop: 10
   }
 })

@@ -13,5 +13,5 @@
       ]
     }
   },
-  "include": ["electron/**/*"]
+  "include": ["electron/**/*", "global.d.ts"]
 }

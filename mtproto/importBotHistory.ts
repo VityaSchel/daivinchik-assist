@@ -10,20 +10,20 @@ const devTest = {
   pages: 2
 }
 
-export function exportHistory(leomatchPeer: Peer, callback: (exported: number, max: number, offset: number) => any, offset_?: number, finishedCallback: () => any) {
+export function exportHistory(leomatchPeer: Peer, callback?: (exported: number, max: number, offset: number) => any, offset?: { type: 'downloadOlder' | 'downloadNewer', value: number }, finishedCallback?: () => any) {
   let abortSignal = false
   let max: number
 
   return {
     promise: new Promise<void>(async (resolve) => {
       const pageSize = devTest.enabled ? devTest.pageSize : 100
-      let offsetID = Number.isInteger(offset_) ? offset_ : undefined
       const realm: Realm = global.realm
       console.log('Message count', realm.objects('Message').length)
-      let exportedMessagesCount = offset_ ? realm.objects('Message').length : 0
+      let exportedMessagesCount = offset ? realm.objects('Message').length : 0
+      let offsetValue = (offset && Number.isInteger(offset?.value)) ? offset.value : undefined
 
       do {
-        console.log('Calling export history with offset', offsetID, 'and limit', pageSize, 'Exported:', exportedMessagesCount)
+        console.log('Calling export history with offset', offset && offsetValue, 'and limit', pageSize, 'Exported:', exportedMessagesCount)
         
         const history = await global.api.call('messages.getHistory', {
           peer: {
@@ -31,19 +31,20 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
             user_id: leomatchPeer.id,
             access_hash: leomatchPeer.access_hash,
           },
-          offset_id: offsetID,
+          ...(offset?.type === 'downloadOlder' && { offset_id: offsetValue }),
+          ...(offset?.type === 'downloadNewer' && { min_id: offsetValue }),
           limit: pageSize
         })
         if(abortSignal) break
 
         const messages = history.messages
 
-        if(offsetID === undefined || offset_ !== undefined) max = history.count
+        if(offsetValue === undefined || offset !== undefined) max = history.count
           
-        offsetID = history.messages[history.messages.length - 1].id
+        offsetValue = history.messages[history.messages.length - 1].id
         exportedMessagesCount += messages.length
+        callback?.(exportedMessagesCount, max, offsetValue ?? 0)
         console.log('Saved', exportedMessagesCount, 'messages')
-        callback(exportedMessagesCount, max, offsetID ?? 0)
         realm.write(() => {
           for(const message of messages) {
             realm.create('Message', Message.generate(message))
@@ -59,7 +60,7 @@ export function exportHistory(leomatchPeer: Peer, callback: (exported: number, m
         }
     
       } while(exportedMessagesCount < max && !abortSignal)
-      if(exportedMessagesCount >= max) finishedCallback()
+      if(exportedMessagesCount >= max) finishedCallback?.()
       resolve()
     }),
     abort: () => { abortSignal = true }
