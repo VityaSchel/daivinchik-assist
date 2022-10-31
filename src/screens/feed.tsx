@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Image, ToastAndroid } from 'react-native'
+import { View, Image, ToastAndroid, ScrollView } from 'react-native'
 import { Text, Button } from 'react-native-paper'
 import Container from '../Container'
 import { useNavigation } from '@react-navigation/native'
@@ -87,32 +87,33 @@ export default function FeedScreen() {
   if(!user) return <View></View>
 
   return (
-    <Container>
-      <View style={styles.userInfo}>
-        {profilePictureBase64 && <Image style={styles.pfp} source={{ uri: profilePictureBase64, width: 30, height: 30 }} />}
-        <Text variant='bodyMedium' style={{ marginRight: 5 }}>{user['first_name']}</Text>
-        <Text variant='bodyMedium'>{user['last_name']}</Text>
-        <Button 
-          mode='text' 
-          compact 
-          onPress={() => {}}
-          style={styles.logout}
-        >Выйти</Button>
-      </View>
-      {state === 'setup' && <LoadHistory onDone={checkState} />}
-      {state === 'update' && (<View style={styles.updating}>
-        <Text variant='bodyLarge'>История подгружается...</Text>
-        <Text variant='bodyMedium' style={styles.text}>
-          Загрузка и анализ новых сообщений, которые появились с момента выхода из Дайвинчик Ассист. Пожалуйста, подождите.
-        </Text>
-      </View>)}
-      {state === 'ready' && <RealtimeProfile />}
-      {process.env.NODE_ENV === 'development' && <Button 
-        mode='outlined'
-        onPress={() => _dev_clearStorage()}
-        style={{ marginTop: 400 }}
-      >[[ Clear messages storage ]]</Button>}
-      
-    </Container>
+    <ScrollView>
+      <Container>
+        <View style={styles.userInfo}>
+          {profilePictureBase64 && <Image style={styles.pfp} source={{ uri: profilePictureBase64, width: 30, height: 30 }} />}
+          <Text variant='bodyMedium' style={{ marginRight: 5 }}>{user['first_name']}</Text>
+          <Text variant='bodyMedium'>{user['last_name']}</Text>
+          <Button 
+            mode='text' 
+            compact 
+            onPress={() => {}}
+            style={styles.logout}
+          >Выйти</Button>
+        </View>
+        {state === 'setup' && <LoadHistory onDone={checkState} />}
+        {state === 'update' && (<View style={styles.updating}>
+          <Text variant='bodyLarge'>История подгружается...</Text>
+          <Text variant='bodyMedium' style={styles.text}>
+            Загрузка и анализ новых сообщений, которые появились с момента выхода из Дайвинчик Ассист. Пожалуйста, подождите.
+          </Text>
+        </View>)}
+        {state === 'ready' && <RealtimeProfile />}
+        {process.env.NODE_ENV === 'development' && <Button 
+          mode='outlined'
+          onPress={() => _dev_clearStorage()}
+          style={{ marginTop: 400 }}
+        >[[ Clear messages storage ]]</Button>}
+      </Container>
+    </ScrollView>  
   )
 }

@@ -1,17 +1,18 @@
 import React from 'react'
-import { Image, ScrollView, View } from 'react-native'
+import { Image, ScrollView, useWindowDimensions, View } from 'react-native'
 import { Button, Text } from 'react-native-paper'
 import { onMessage } from '../../../../mtproto/updates'
 import { getPhoto } from '../../../../mtproto/utils'
 import { detectMessageType, Message, MessageFields, userProfileRegex } from '../../../models/Message'
 import { Message as MTProtoMessage } from '../../../ts/MessageSchema'
-import styles from './styles'
+import { defaultStyles, compactStyles } from './styles'
 import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade } from 'rn-placeholder'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { MessageRealmContext } from '../../../models'
 import InteractionsHistory from './InteractionsHistory'
 import Instagram from './Instagram'
 import { getLatestMessage } from '../../../../mtproto'
+import useResponsiveStyles from '../../hooks/useResponsiveStyles'
 
 export type ProfileType = {
   picture: null | string
@@ -23,11 +24,12 @@ export type ProfileType = {
   personalMessage?: string
 }
 
+
 export default function RealtimeProfile() {
   const [profile, setProfile] = React.useState<null | ProfileType>(null)
   const [profilePicture, setProfilePicture] = React.useState<null | string>(null)
   const realm = MessageRealmContext.useRealm()
-
+  
   React.useEffect(() => {
     getLatestMessage().then(latestMsg => latestMsg !== undefined && newMessage(latestMsg))
     const callback = onMessage(newMessage)
@@ -79,12 +81,6 @@ export default function RealtimeProfile() {
         ? <Profile data={{ ...profile, picture: profilePicture }} />
         : <Pending />
       }
-      {/* {process.env.NODE_ENV === 'development' && (
-        <Button 
-          mode='outlined'
-          onPress={() => { realm.write(() => realm.objects('Message', Message.generate({"_": "message", "date": 1666543945, "edit_hide": false, "flags": 131584, "from_scheduled": false, "grouped_id": "13332351565913690", "id": 11385, "legacy": false, "media": {"_": "messageMediaPhoto", "flags": 1, "photo": {"_": "photo", "access_hash": "2022908885812767181", "date": 1666200790, "dc_id": 2, "file_reference": [], "flags": 0, "has_stickers": false, "id": "5368747569003481200", "sizes": [Array]}}, "media_unread": false, "mentioned": false, "message": "вова, 15, Самара – Омг", "noforwards": false, "out": false, "peer_id": {"_": "peerUser", "user_id": "1234060895"}, "pinned": false, "post": false, "silent": false}))) }}
-        >[[ Add to DB ]]</Button>
-      )} */}
     </View>
   )
 }
@@ -101,16 +97,17 @@ function Profile(props: { data: ProfileType }) {
 
 function MiniProfile(props: { data: ProfileType }) {
   const pfpURI = props.data.picture
+  const styles = useResponsiveStyles(defaultStyles, compactStyles)
 
   return (
     <View style={styles.miniProfile}>
       {pfpURI
-        ? <Image style={styles.pfp} source={{ uri: pfpURI, width: 100, height: 100 }} />
+        ? <Image style={styles.pfp} source={{ uri: pfpURI }} />
         : <Placeholders />
       }
       <View style={styles.info}>
-        <Text variant='titleLarge' style={styles.bold}>{props.data.name}</Text>
-        <Text variant='bodyLarge' style={styles.bold}><Icon name='map-marker' size={15} /> {props.data.place}</Text>
+        <Text variant='titleLarge' style={styles.name}>{props.data.name}</Text>
+        <Text variant='bodyLarge' style={styles.infoPlace}><Icon name='map-marker' size={15} /> {props.data.place}</Text>
         <Text variant='bodyLarge' style={styles.infoAge}>{props.data.age} лет</Text>
         <Text variant='bodyMedium' style={styles.infoText} numberOfLines={1}>{props.data.text}</Text>
       </View>
@@ -119,17 +116,21 @@ function MiniProfile(props: { data: ProfileType }) {
 }
 
 function Placeholders() {
+  const styles = useResponsiveStyles(defaultStyles, compactStyles)
+
   return (
     <Placeholder
       Animation={Fade}
       style={styles.pfpPlaceholder}
     >
-      <PlaceholderMedia size={100} style={{ borderRadius: 15 }} />
+      <PlaceholderMedia size={styles.pfpPlaceholderSize.width} style={{ borderRadius: 15 }} />
     </Placeholder>
   )
 }
 
 function Pending() {
+  const styles = useResponsiveStyles(defaultStyles, compactStyles)
+
   return (
     <View style={styles.pending}>
       <Text variant='labelLarge' style={styles.pending.title}>Продолжайте листать анкеты</Text>

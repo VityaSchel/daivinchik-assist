@@ -6,10 +6,12 @@ import type { MessageFields } from '../../../models/Message'
 import type { ProfileType } from './index'
 import { format } from 'date-fns'
 import { default as dateFnsRu } from 'date-fns/locale/ru'
-import styles from './styles'
+import { defaultStyles, compactStyles } from './styles'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import useResponsiveStyles from '../../hooks/useResponsiveStyles'
 
 export default function InteractionsHistory(props: { data: ProfileType }) {
+  const styles = useResponsiveStyles(defaultStyles, compactStyles)
   const realm = MessageRealmContext.useRealm()
   const history = realm.objects('Message')
     .filtered('text = $0', props.data.fullText)
@@ -18,7 +20,7 @@ export default function InteractionsHistory(props: { data: ProfileType }) {
   return (
     <View style={styles.interactions}>
       <Text variant='titleMedium'>История взаимодействий:</Text>
-      <ScrollView style={history.length ? styles.history : {}}>
+      <ScrollView style={history.length ? styles.history : {}} nestedScrollEnabled>
         {history.length === 0
           ? <Text variant='bodyMedium'>Вы еще не встречали эту анкету</Text>
           : history.map(entry => (

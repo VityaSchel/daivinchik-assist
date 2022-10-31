@@ -3,14 +3,16 @@ import { View } from 'react-native'
 import { ActivityIndicator, IconButton, Text } from 'react-native-paper'
 import type { ProfileType } from './index'
 import { WebView } from 'react-native-webview'
-import styles from './styles'
+import { defaultStyles, compactStyles } from './styles'
 import * as Linking from 'expo-linking'
+import useResponsiveStyles from '../../hooks/useResponsiveStyles'
 
 const instagramMatchInProfile = /(inst|insta|инст|инста|инсте|инстаграме?)(: ?| ?- ?| ?– ?| ?— ?| )([a-zA-Z0-9._]{3,30})/i
 
 export default function Instagram(props: { data: ProfileType }) {
   const instagramUsernameHandle = props.data.text?.match(instagramMatchInProfile)?.[3]
   const [browserKey, setBrowserKey] = React.useState(Date.now())
+  const styles = useResponsiveStyles(defaultStyles, compactStyles)
 
   const openInBrowser = () => {
     Linking.openURL(`https://instagram.com/${instagramUsernameHandle}`)
@@ -48,6 +50,7 @@ export default function Instagram(props: { data: ProfileType }) {
 }
 
 function Profile(props: { handle: string }) {
+  const styles = useResponsiveStyles(defaultStyles, compactStyles)
   const profileURI = `https://www.instagram.com/${props.handle}/`
 
   const injectedCssStyles = `
@@ -67,7 +70,7 @@ function Profile(props: { handle: string }) {
     <View style={styles.instagramContainer}>
       <WebView
         source={{ uri: profileURI }}
-        startInLoadingState
+        startInLoadingState nestedScrollEnabled
         renderLoading={() => <ActivityIndicator />}
         onNavigationStateChange ={() => false}
         onShouldStartLoadWithRequest ={(request) => {
